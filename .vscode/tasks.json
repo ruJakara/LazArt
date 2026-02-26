@@ -1,0 +1,37 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Deploy All Bots",
+      "type": "shell",
+      "command": "ssh root@89.191.225.207 '/opt/bots/deploy-all.sh'",
+      "group": "build",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "label": "Deploy bot_project",
+      "type": "shell",
+      "command": "ssh root@89.191.225.207 'cd /opt/bots/bot_project && ./deploy.sh'",
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "Deploy botfinder",
+      "type": "shell",
+      "command": "ssh root@89.191.225.207 'cd /opt/bots/botfinder && ./deploy.sh'",
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "Status all bots",
+      "type": "shell",
+      "command": "ssh root@89.191.225.207 'systemctl status kiberone-bot.service kiberone-botfinder.service --no-pager'",
+      "group": "test",
+      "problemMatcher": []
+    }
+  ]
+}
