@@ -1,0 +1,128 @@
+[
+  {
+    "id": "dasha_tg",
+    "name": "Кликер Даши",
+    "description": "Игра ученицы Даши из папки teGame/dasha tg",
+    "enabled": true
+  },
+  {
+    "id": "hopertg",
+    "name": "Кликер Хопера",
+    "description": "Игра ученика Hopertg из папки teGame/Hopertg",
+    "enabled": true
+  },
+  {
+    "id": "igra_tg_tamur",
+    "name": "Игра Тамура",
+    "description": "Игра ученика Тамура из папки teGame/igra tg tamur",
+    "enabled": true
+  },
+  {
+    "id": "kristina",
+    "name": "Игра Кристины",
+    "description": "Отель для хомячков",
+    "enabled": true
+  },
+  {
+    "id": "lexa_puzzle",
+    "name": "Головоломка Лёши",
+    "description": "Головоломка с водой",
+    "enabled": true
+  },
+  {
+    "id": "lexa_clicker",
+    "name": "Кликер Лёши",
+    "description": "Кликер",
+    "enabled": true
+  },
+  {
+    "id": "rpuk_tg",
+    "name": "Игра Rpuk",
+    "description": "Маджонг",
+    "enabled": true
+  },
+  {
+    "id": "sapep",
+    "name": "Сапёр",
+    "description": "Игра sapep из папки teGame/sapep",
+    "enabled": true
+  },
+  {
+    "id": "tonya_tg",
+    "name": "Игра Тони",
+    "description": "Три в ряд",
+    "enabled": true
+  },
+  {
+    "id": "hacker_neon",
+    "name": "Хакер Неон",
+    "description": "Игра из папки teGame/ХАКЕР НЕОН",
+    "enabled": true
+  },
+  {
+    "id": "alhimic",
+    "name": "Алхимик",
+    "description": "Игра Алхимик — смешивай элементы",
+    "enabled": true
+  },
+  {
+    "id": "artemTG",
+    "name": "Игра Артема",
+    "description": "Игра ученика Артема",
+    "enabled": true
+  },
+  {
+    "id": "block_blast",
+    "name": "Block Blast",
+    "description": "Головоломка Block Blast",
+    "enabled": true
+  },
+  {
+    "id": "naydi_pary",
+    "name": "Найди пару",
+    "description": "Игра на поиск пар",
+    "enabled": true
+  },
+  {
+    "id": "piano_master",
+    "name": "Пианино",
+    "description": "Музыкальная игра Пианино",
+    "enabled": true
+  },
+  {
+    "id": "qwerty",
+    "name": "Qwerty",
+    "description": "Игра Qwerty",
+    "enabled": true
+  },
+  {
+    "id": "shadow_slayer",
+    "name": "Shadow Slayer",
+    "description": "Битва с тенями",
+    "enabled": true
+  },
+  {
+    "id": "syzet",
+    "name": "Syzet",
+    "description": "Игра Syzet",
+    "enabled": true
+  },
+  {
+    "id": "igra_chisla",
+    "name": "Игра в числа",
+    "description": "Математическая игра из teGame",
+    "enabled": true
+  },
+  {
+    "id": "vegas_casino",
+    "name": "Vegas Casino",
+    "description": "Казино игры",
+    "enabled": true
+  },
+  {
+    "id": "vitalik",
+    "name": "Виталик",
+    "description": "Игра Виталика",
+    "enabled": true
+  }
+]
