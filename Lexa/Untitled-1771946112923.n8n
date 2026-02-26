@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-02-24T16:21:32.064Z",
+  "updatedAt": "2026-02-25T07:15:39.427Z",
   "createdAt": "2026-02-24T15:15:14.646Z",
   "id": "hc8MkL8WHr0pUlv1",
   "name": "Leha Factory v1",
@@ -15,7 +15,7 @@
       "typeVersion": 1,
       "position": [
         0,
-        300
+        304
       ]
     },
     {
@@ -38,27 +38,14 @@
             {
               "name": "X-Title",
               "value": "Leha Factory"
-            }
+            },
+            {}
           ]
         },
         "sendBody": true,
-        "contentType": "json",
-        "body": {
-          "model": "meta-llama/llama-3-8b-instruct:free",
-          "max_tokens": 300,
-          "temperature": 0.7,
-          "response_format": {
-            "type": "json_object"
-          },
-          "messages": [
-            {
-              "role": "system",
-              "content": "You are a video script generator. You MUST return ONLY a valid JSON object, no comments, no text outside JSON. Use this exact schema:\n{\n  \"hook\": \"<one attention-grabbing opening sentence>\",\n  \"voiceover\": \"<full narration text, 3-4 sentences>\",\n  \"scenes\": [\"<scene 1 description>\", \"<scene 2 description>\", \"<scene 3 description>\"],\n  \"hashtags\": [\"#tag1\", \"#tag2\", \"#tag3\", \"#tag4\", \"#tag5\"]\n}"
-            },
-            {
-              "role": "user",
-              "content": "Generate a short educational video script about an interesting science or history fact. Return strict JSON only."
-            }
+        "bodyParameters": {
+          "parameters": [
+            {}
           ]
         },
         "options": {
@@ -75,7 +62,7 @@
       "typeVersion": 4.2,
       "position": [
         240,
-        300
+        304
       ],
       "credentials": {
         "httpHeaderAuth": {
@@ -86,7 +73,6 @@
     },
     {
       "parameters": {
-        "language": "javaScript",
         "jsCode": "// Parse the OpenRouter response and extract content\nconst response = $input.first().json;\n\n// Extract the message content from OpenRouter response structure\nconst rawContent = response?.choices?.[0]?.message?.content;\n\nif (!rawContent) {\n  throw new Error('No content in OpenRouter response: ' + JSON.stringify(response));\n}\n\n// Parse JSON (model should return strict JSON per system prompt)\nlet parsed;\ntry {\n  parsed = typeof rawContent === 'string' ? JSON.parse(rawContent) : rawContent;\n} catch (e) {\n  throw new Error('Failed to parse model JSON. Raw content: ' + rawContent);\n}\n\n// Validate required fields\nconst hook = parsed.hook || '';\nconst voiceover = parsed.voiceover || '';\nconst scenes = Array.isArray(parsed.scenes) ? parsed.scenes : [];\nconst hashtags = Array.isArray(parsed.hashtags) ? parsed.hashtags : [];\n\nreturn [{\n  json: {\n    hook,\n    voiceover,\n    scenes,\n    hashtags,\n    _meta: {\n      model: response?.model || 'meta-llama/llama-3-8b-instruct:free',\n      usage: response?.usage || null,\n      parsed_ok: true\n    }\n  }\n}];"
       },
       "id": "node-parse",
@@ -95,7 +81,7 @@
       "typeVersion": 2,
       "position": [
         480,
-        300
+        304
       ]
     },
     {
@@ -142,7 +128,7 @@
       "typeVersion": 3.4,
       "position": [
         720,
-        300
+        304
       ]
     }
   ],
@@ -192,9 +178,9 @@
   "staticData": null,
   "meta": null,
   "pinData": {},
-  "versionId": "78df10ae-f55c-44ca-a499-c2972d305e1c",
+  "versionId": "747cbdaa-695a-43c0-ae65-aff2d74c3ac4",
   "activeVersionId": null,
-  "versionCounter": 13,
+  "versionCounter": 17,
   "triggerCount": 0,
   "shared": [
     {
