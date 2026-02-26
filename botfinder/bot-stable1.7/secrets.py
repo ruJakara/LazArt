@@ -7,7 +7,7 @@ import os
 
 # --- API Keys (из переменных окружения или по умолчанию) ---
 PERPLEXITY_API_KEY = os.getenv("PERPLEXITY_API_KEY", "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")
-TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "8500861592:AAHj3wJBbsu_wJa2NlavcgoAwA-fDrByO6k")
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "8694950235:AAGc1VCrMUywiQ46twf_d04BjCPZQ1ZtLS4")
 
 # --- Bot Password ---
 BOT_PASSWORD = os.getenv("BOT_PASSWORD", "1")
