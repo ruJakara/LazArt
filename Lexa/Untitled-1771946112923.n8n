@@ -1,0 +1,220 @@
+{
+  "updatedAt": "2026-02-24T16:21:32.064Z",
+  "createdAt": "2026-02-24T15:15:14.646Z",
+  "id": "hc8MkL8WHr0pUlv1",
+  "name": "Leha Factory v1",
+  "description": null,
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "node-manual-trigger",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://openrouter.ai/api/v1/chat/completions",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "HTTP-Referer",
+              "value": "https://leha-factory.local"
+            },
+            {
+              "name": "X-Title",
+              "value": "Leha Factory"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "body": {
+          "model": "meta-llama/llama-3-8b-instruct:free",
+          "max_tokens": 300,
+          "temperature": 0.7,
+          "response_format": {
+            "type": "json_object"
+          },
+          "messages": [
+            {
+              "role": "system",
+              "content": "You are a video script generator. You MUST return ONLY a valid JSON object, no comments, no text outside JSON. Use this exact schema:\n{\n  \"hook\": \"<one attention-grabbing opening sentence>\",\n  \"voiceover\": \"<full narration text, 3-4 sentences>\",\n  \"scenes\": [\"<scene 1 description>\", \"<scene 2 description>\", \"<scene 3 description>\"],\n  \"hashtags\": [\"#tag1\", \"#tag2\", \"#tag3\", \"#tag4\", \"#tag5\"]\n}"
+            },
+            {
+              "role": "user",
+              "content": "Generate a short educational video script about an interesting science or history fact. Return strict JSON only."
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "node-openrouter",
+      "name": "OpenRouter — Llama 3 8B",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        240,
+        300
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "openrouter-bearer",
+          "name": "OpenRouter Bearer"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "language": "javaScript",
+        "jsCode": "// Parse the OpenRouter response and extract content\nconst response = $input.first().json;\n\n// Extract the message content from OpenRouter response structure\nconst rawContent = response?.choices?.[0]?.message?.content;\n\nif (!rawContent) {\n  throw new Error('No content in OpenRouter response: ' + JSON.stringify(response));\n}\n\n// Parse JSON (model should return strict JSON per system prompt)\nlet parsed;\ntry {\n  parsed = typeof rawContent === 'string' ? JSON.parse(rawContent) : rawContent;\n} catch (e) {\n  throw new Error('Failed to parse model JSON. Raw content: ' + rawContent);\n}\n\n// Validate required fields\nconst hook = parsed.hook || '';\nconst voiceover = parsed.voiceover || '';\nconst scenes = Array.isArray(parsed.scenes) ? parsed.scenes : [];\nconst hashtags = Array.isArray(parsed.hashtags) ? parsed.hashtags : [];\n\nreturn [{\n  json: {\n    hook,\n    voiceover,\n    scenes,\n    hashtags,\n    _meta: {\n      model: response?.model || 'meta-llama/llama-3-8b-instruct:free',\n      usage: response?.usage || null,\n      parsed_ok: true\n    }\n  }\n}];"
+      },
+      "id": "node-parse",
+      "name": "Parse JSON Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "out-hook",
+              "name": "hook",
+              "value": "={{ $json.hook }}",
+              "type": "string"
+            },
+            {
+              "id": "out-voiceover",
+              "name": "voiceover",
+              "value": "={{ $json.voiceover }}",
+              "type": "string"
+            },
+            {
+              "id": "out-scenes",
+              "name": "scenes",
+              "value": "={{ $json.scenes }}",
+              "type": "array"
+            },
+            {
+              "id": "out-hashtags",
+              "name": "hashtags",
+              "value": "={{ $json.hashtags }}",
+              "type": "array"
+            },
+            {
+              "id": "out-model",
+              "name": "model_used",
+              "value": "={{ $json._meta.model }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "node-set",
+      "name": "Set — Clean Output",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        720,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "OpenRouter — Llama 3 8B",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter — Llama 3 8B": {
+      "main": [
+        [
+          {
+            "node": "Parse JSON Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse JSON Response": {
+      "main": [
+        [
+          {
+            "node": "Set — Clean Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false,
+    "errorWorkflow": "",
+    "saveManualExecutions": true,
+    "saveExecutionProgress": true,
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "78df10ae-f55c-44ca-a499-c2972d305e1c",
+  "activeVersionId": null,
+  "versionCounter": 13,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-02-24T15:15:14.648Z",
+      "createdAt": "2026-02-24T15:15:14.648Z",
+      "role": "workflow:owner",
+      "workflowId": "hc8MkL8WHr0pUlv1",
+      "projectId": "JEXwxnmZPB7Dp0NQ",
+      "project": {
+        "updatedAt": "2026-02-23T15:24:40.778Z",
+        "createdAt": "2026-02-23T13:26:11.213Z",
+        "id": "JEXwxnmZPB7Dp0NQ",
+        "name": "Артемий Лазар <rujakara1@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "15a2d90b-c627-4930-883f-377a616ed289"
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": null
+}
