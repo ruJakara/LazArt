@@ -10,7 +10,6 @@ Environment="PATH=/opt/bots/lazart/botfinder/venv/bin"
 ExecStart=/opt/bots/lazart/botfinder/venv/bin/python /opt/bots/lazart/botfinder/main.py
 Restart=always
 RestartSec=5
-EnvironmentFile=/opt/bots/lazart/botfinder/.env
 
 [Install]
 WantedBy=multi-user.target
