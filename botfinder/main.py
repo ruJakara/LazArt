@@ -91,11 +91,14 @@ async def process_news_cycle(broadcaster: Optional[Broadcaster] = None):
             recent_hashes = await NewsRepository.get_recent_simhashes(session, hours=72)
             deduplicator.set_existing_hashes(recent_hashes)
             
-            # Check for First Run (no signals ever sent)
-            last_signal_date = await SignalRepository.get_last_signal_date(session)
-            is_first_run = (last_signal_date is None)
+            # Check for First Run (no news ever processed)
+            # Use news count instead of signal date to avoid deadlock:
+            # if keywords were misconfigured, no signals are generated,
+            # which keeps is_first_run=True forever, skipping all items.
+            news_count = await NewsRepository.get_news_count(session)
+            is_first_run = (news_count == 0)
             if is_first_run:
-                logger.info("first_run_detected", msg="No prior signals found. Skipping signal generation for historical data.")
+                logger.info("first_run_detected", msg="Empty database. Skipping signal generation for initial data load.")
         
         # Counters for cycle stats
         stats = {

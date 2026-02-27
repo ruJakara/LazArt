@@ -176,6 +176,14 @@ class NewsRepository:
         # This is a placeholder - actual VACUUM requires raw connection
         pass
 
+    @staticmethod
+    async def get_news_count(session: AsyncSession) -> int:
+        """Get total number of news records in database."""
+        result = await session.execute(
+            select(func.count(News.id))
+        )
+        return result.scalar() or 0
+
 
 class SignalRepository:
     """Repository for signal operations."""
