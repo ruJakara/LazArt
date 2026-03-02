@@ -6,55 +6,39 @@ from typing import Any, Dict, Optional, Union
 
 import requests
 
-from config import ALFA_API_KEY, ALFA_BASE_URL, ALFA_EMAIL
+from config import get_settings
 
 logger = logging.getLogger(__name__)
 
-_TOKEN_CACHE: Dict[str, Optional[Union[str, float]]] = {
-    "token": None,
-    "expires_at": None,
-}
-_TOKEN_TTL_SECONDS = 3600
+_settings = get_settings()
+
+# AlfaCRM v2 API uses a token directly (no email/password login required)
+_ALFACRM_DOMAIN = _settings.alfacrm_domain or ""
+_ALFACRM_TOKEN = _settings.alfacrm_token or ""
+
 _REQUEST_TIMEOUT_SECONDS = 20
 
 
 def _build_api_url(path: str) -> str:
-    base = ALFA_BASE_URL.rstrip("/")
-    if path.startswith("http"):
-        return path
+    if not _ALFACRM_DOMAIN:
+        raise RuntimeError("ALFACRM_DOMAIN is not configured")
+    base = f"https://{_ALFACRM_DOMAIN}".rstrip("/")
     return f"{base}/{path.lstrip('/')}"
 
 
-def get_token() -> str:
-    now = time.time()
-    cached_token = _TOKEN_CACHE.get("token")
-    expires_at = _TOKEN_CACHE.get("expires_at")
-    if cached_token and isinstance(expires_at, (int, float)) and now < expires_at:
-        logger.info("Using cached AlfaCRM token")
-        return str(cached_token)
-
-    url = _build_api_url("v2api/auth/login")
-    payload = {"email": ALFA_EMAIL, "api_key": ALFA_API_KEY}
-    logger.info("Requesting AlfaCRM token")
-    response = requests.post(url, json=payload, timeout=_REQUEST_TIMEOUT_SECONDS)
-    response.raise_for_status()
-
-    data = response.json() if response.content else {}
-    token = data.get("token") or data.get("data", {}).get("token")
-    if not token:
-        raise RuntimeError(f"AlfaCRM token missing in response: {data}")
-
-    _TOKEN_CACHE["token"] = token
-    _TOKEN_CACHE["expires_at"] = now + _TOKEN_TTL_SECONDS
-    return str(token)
+def _headers() -> dict:
+    if not _ALFACRM_TOKEN:
+        raise RuntimeError("ALFACRM_TOKEN is not configured")
+    return {
+        "X-ALFACRM-TOKEN": _ALFACRM_TOKEN,
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+    }
 
 
 def api_request(method: str, path: str, json: Optional[Dict[str, Any]] = None) -> Any:
     url = _build_api_url(path)
-    token = get_token()
-    headers = {
-        "X-ALFACRM-TOKEN": token,
-    }
+    headers = _headers()
 
     logger.info("AlfaCRM request %s %s", method.upper(), url)
     response = requests.request(
@@ -64,21 +48,6 @@ def api_request(method: str, path: str, json: Optional[Dict[str, Any]] = None) -
         headers=headers,
         timeout=_REQUEST_TIMEOUT_SECONDS,
     )
-
-    access_denied_text = response.text.lower()
-    if response.status_code == 401 or "access denied" in access_denied_text or "accessdenied" in access_denied_text:
-        logger.warning("AlfaCRM token rejected, retrying with new token")
-        _TOKEN_CACHE["token"] = None
-        _TOKEN_CACHE["expires_at"] = None
-        token = get_token()
-        headers["X-ALFACRM-TOKEN"] = token
-        response = requests.request(
-            method,
-            url,
-            json=json,
-            headers=headers,
-            timeout=_REQUEST_TIMEOUT_SECONDS,
-        )
 
     response.raise_for_status()
 
