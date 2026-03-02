@@ -66,12 +66,17 @@ def games_keyboard(games: List[Dict]) -> InlineKeyboardMarkup:
 
 
 def play_game_keyboard(game_id: str, session_id: str) -> InlineKeyboardMarkup:
+    base = settings.webapp_base_url
+    # Ensure base URL has a protocol
+    if not base.startswith("http://") and not base.startswith("https://"):
+        base = f"https://{base}"
+    base = base.rstrip("/")
     game_path = settings.game_paths.get(game_id)
     if not game_path:
-        url = f"https://{settings.webapp_base_url}/"
+        url = f"{base}/"
     else:
         safe_path = quote(game_path, safe="/")
-        url = f"https://{settings.webapp_base_url}/{safe_path}?gameid={game_id}&sessionid={session_id}"
+        url = f"{base}/{safe_path}?gameid={game_id}&sessionid={session_id}"
     return InlineKeyboardMarkup(
         inline_keyboard=[
             [InlineKeyboardButton(text="🎮 Запустить игру", web_app=WebAppInfo(url=url))]

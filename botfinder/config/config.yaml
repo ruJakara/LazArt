@@ -5,6 +5,24 @@
 # --- Keywords for Filter Level 1 ---
 keywords:
   positive:
+    oil_gas:        # ⭐⭐⭐⭐⭐ вес 6
+    - "нефтепровод"
+    - "газопровод" 
+    - "скважина"
+    - "ГНВП"
+    - "пожар скважины"
+    - "Сургутнефтегаз"
+    - "Роснефть"
+    - "Газпром"
+    - "Ямал СПГ"
+    chem_industry:   # ⭐⭐⭐⭐ вес 5
+    - "химзавод"
+    - "шламовый насос"
+    - "вакуумный насос"
+    - "разгерметизация"
+    - "аммиак"
+    - "химическая"
+    - "Сибур"
     accident:
       - "авария"
       - "прорыв"
@@ -87,9 +105,11 @@ keywords:
 
 # --- Scoring Weights ---
 weights:
+  oil_gas: 6
+  chem_industry: 5
+  infrastructure: 3  # ЖКХ на 3-е место
   accident: 3
   repair: 2
-  infrastructure: 4
   industrial: 2
   negative: -5
   stage_early: 1
@@ -98,6 +118,14 @@ weights:
 
 # --- Geography ---
 geography:
+  priority_regions:
+    - KhMAO_YANAO    # ⭐⭐⭐⭐⭐
+    - Tyumen         # ⭐⭐⭐⭐⭐
+    - Siberia        # ⭐⭐⭐⭐
+    - Yakutia        # ⭐⭐⭐
+    - Irkutsk        # ⭐⭐⭐
+  priority_bonus: 2
+
   city_to_region:
     "Йошкар-Ола": "Марий Эл"
     "Калининград": "Калининградская область"
@@ -117,6 +145,132 @@ thresholds:
 
 # --- RSS Sources ---
 sources:
+# СЕВЕР/СИБИРЬ — НЕФТЕГАЗ + ХИМПРОМ (основной рынок)
+  - id: "north_001"
+    name: "Neftegaz.ru – Нефть/Газ ЧП" 
+    url: "https://neftegaz.ru/rss/news.xml"
+    region_hint: "KhMAO_YANAO"
+
+  - id: "north_002"
+    name: "Chp-hmao.ru – ЧП ХМАО (Сургут/Н.варт.)"
+    url: "https://chp-hmao.ru/rss/"
+    region_hint: "KhMAO"
+
+  - id: "north_003"
+    name: "KP.ru Тюмень – Происшествия"
+    url: "https://www.tumen.kp.ru/rss/proisshestviya/"
+    region_hint: "Tyumen"
+
+  - id: "north_004"
+    name: "Megatyumen.ru – Тюмень"
+    url: "https://megatyumen.ru/rss/"
+    region_hint: "Tyumen"
+
+  - id: "north_005"
+    name: "Si.ru – Новости Сибири"
+    url: "https://www.sibreal.org/rss/"
+    region_hint: "Siberia"
+
+  - id: "north_006"
+    name: "RG.ru ЯНАО"
+    url: "https://rg.ru/region/urfo/yanao/rss.xml"
+    region_hint: "YANAO"
+
+  - id: "north_007"
+    name: "News.Yanao.ru – ЯНАО"
+    url: "https://news.yanao.ru/rss/"
+    region_hint: "YANAO"
+
+  - id: "north_008"
+    name: "Surgutinform.tv – Сургут"
+    url: "https://surgutinform.tv/rss/"
+    region_hint: "KhMAO"
+
+  - id: "north_009"
+    name: "Nizhnevartovsk-online.ru"
+    url: "https://nvs.ru/rss/"
+    region_hint: "KhMAO"
+
+  - id: "north_010"
+    name: "Ugansk.tv – Югра"
+    url: "https://ugansk.tv/rss/"
+    region_hint: "KhMAO"
+
+  - id: "north_011"
+    name: "Noyabrsk-news.ru – Ноябрьск"
+    url: "https://noyabrsk-news.ru/rss/"
+    region_hint: "YANAO"
+
+  - id: "north_012"
+    name: "Irk.ru – Иркутск происшествия"
+    url: "https://irk.ru/rss/incidents/"
+    region_hint: "Irkutsk"
+
+  - id: "north_013"
+    name: "Baikal24.ru – Байкал"
+    url: "https://baikal24.ru/rss/proisshestviya/"
+    region_hint: "Irkutsk"
+
+  - id: "north_014"
+    name: "KP.ru Новосиб – Происшествия"
+    url: "https://novo-sibirsk.kp.ru/rss/proisshestviya/"
+    region_hint: "Novosibirsk"
+
+  - id: "north_015"
+    name: "Krasnoyarsk.kp.ru"
+    url: "https://krasnoyarsk.kp.ru/rss/proisshestviya/"
+    region_hint: "Krasnoyarsk"
+
+  - id: "north_016"
+    name: "Vesti-k.ru – Красноярск"
+    url: "https://vesti-k.ru/rss/"
+    region_hint: "Krasnoyarsk"
+
+  - id: "north_017"
+    name: "Sakha-news.ru – Якутия"
+    url: "https://sakha-news.ru/rss/"
+    region_hint: "Yakutia"
+
+  - id: "north_018"
+    name: "Yakutia.info – Якутск"
+    url: "https://yakutia.info/rss/"
+    region_hint: "Yakutia"
+
+  - id: "north_019"
+    name: "Politsiya-hmao.ru – МЧС Югра"
+    url: "https://mchs.gov.ru/rss/dep/86"
+    region_hint: "KhMAO"
+
+  - id: "north_020"
+    name: "Rosneft.ru – Новости"
+    url: "https://www.rosneft.ru/rss/news/"
+    region_hint: "KhMAO_YANAO"
+
+  - id: "north_021"
+    name: "Gazprom.ru – ЧП"
+    url: "https://www.gazprom.ru/rss/press-center/"
+    region_hint: "Siberia"
+
+  - id: "north_022"
+    name: "Surgutneftegas.ru"
+    url: "https://www.surgutneftegas.ru/rss/"
+    region_hint: "KhMAO"
+
+  - id: "north_023"
+    name: "Lukoil.ru – Производство"
+    url: "https://lukoil.ru/rss/news/"
+    region_hint: "Siberia"
+
+  - id: "north_024"
+    name: "Sibur.ru – Химпром"
+    url: "https://sibur.ru/rss/press/"
+    region_hint: "Siberia"
+
+  - id: "north_025"
+    name: "Tomsk-oil.ru – Томск нефть"
+    url: "https://tomsk-oil.ru/rss/"
+    region_hint: "Tomsk"
+  
   - id: "src_001"
     type: "google_news_rss"
     name: "Google News Russia (ЖКХ)"
