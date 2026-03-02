@@ -18,6 +18,7 @@ EVENT_TYPE_RU = {
     "accident": "авария",
     "outage": "остановка",
     "repair": "ремонт",
+    "tender": "тендер",
     "other": "другое"
 }
 
@@ -93,6 +94,38 @@ def format_signal_message(
     )
 
 
+def format_tender_message(
+    title: str,
+    urgency: int,
+    url: str,
+    tender_deadline: str = None,
+    tender_amount: str = None,
+    tender_customer: str = None
+) -> str:
+    """
+    Format tender signal message.
+    
+    Format:
+    🚨 ТЕНДЕР | <предмет> | <срочность>/5
+    📅 Закрытие: <дата>
+    💰 Сумма: <сумма>
+    Заказчик: <заказчик>
+    Источник: <ссылка>
+    """
+    title_clean = truncate_field(title, 200)
+    deadline = tender_deadline or "не указано"
+    amount = tender_amount or "не указано"
+    customer = tender_customer or "не указан"
+    
+    return (
+        f"🚨 ТЕНДЕР | {title_clean} | {urgency}/5\n"
+        f"📅 Закрытие: {deadline}\n"
+        f"💰 Сумма: {amount}\n"
+        f"Заказчик: {customer}\n"
+        f"Источник: {url}"
+    )
+
+
 def create_signal_from_llm(
     llm_response: LLMResponse,
     title: str,
@@ -106,15 +139,26 @@ def create_signal_from_llm(
     """
     sphere = map_object_to_sphere(llm_response.object)
     
-    message = format_signal_message(
-        event_type=llm_response.event_type,
-        urgency=llm_response.urgency,
-        region=region,
-        object_type=llm_response.object,
-        title=title,
-        why=llm_response.why,
-        url=url
-    )
+    # Use tender-specific format when event_type is tender
+    if llm_response.event_type == "tender":
+        message = format_tender_message(
+            title=title,
+            urgency=llm_response.urgency,
+            url=url,
+            tender_deadline=llm_response.tender_deadline,
+            tender_amount=llm_response.tender_amount,
+            tender_customer=llm_response.tender_customer
+        )
+    else:
+        message = format_signal_message(
+            event_type=llm_response.event_type,
+            urgency=llm_response.urgency,
+            region=region,
+            object_type=llm_response.object,
+            title=title,
+            why=llm_response.why,
+            url=url
+        )
     
     return {
         "event_type": llm_response.event_type,

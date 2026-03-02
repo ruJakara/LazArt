@@ -15,12 +15,16 @@ logger = get_logger("pipeline.llm")
 
 class LLMResponse(BaseModel):
     """Strict output schema for LLM classification."""
-    event_type: Literal["accident", "outage", "repair", "other"]
+    event_type: Literal["accident", "outage", "repair", "tender", "other"]
     relevance: float = Field(ge=0.0, le=1.0)
     urgency: int = Field(ge=1, le=5)
     object: Literal["water", "heat", "industrial", "unknown"]
     why: str
     action: Literal["call", "watch", "ignore"]
+    # Tender-specific fields (optional)
+    tender_deadline: Optional[str] = None
+    tender_amount: Optional[str] = None
+    tender_customer: Optional[str] = None
 
 
 class LLMClient:
@@ -236,10 +240,20 @@ class LLMClient:
 Текст: {text[:1500]}
 
 ЗАДАЧА:
-Определи, является ли это ТЕКУЩЕЙ ТЕХНОГЕННОЙ АВАРИЕЙ в ЖКХ или Промышленности.
+Определи, является ли это ТЕКУЩЕЙ ТЕХНОГЕННОЙ АВАРИЕЙ в ЖКХ/Промышленности ИЛИ ТЕНДЕРОМ на закупку оборудования/услуг в ЖКХ/Промышленности.
+
+ДЛЯ АВАРИЙ:
+- event_type: accident | outage | repair
+- relevance 0.8+ для серьёзных аварий
+- urgency 4-5 для активных аварий
+
+ДЛЯ ТЕНДЕРОВ:
+- event_type: "tender"
+- relevance 0.7+ для тендеров по ЖКХ/промышленности
+- Извлеки tender_deadline (дата закрытия), tender_amount (сумма), tender_customer (заказчик) если есть
 
 ИГНОРИРУЙ (relevance=0):
-- Плановые работы, отключения, учения
+- Плановые работы, учения
 - ДТП, пожары в жилых домах (бытовые)
 - Завершенные события ("авария устранена")
 - Криминал, политика, коррупция
@@ -247,12 +261,15 @@ class LLMClient:
 
 ВЫХОД (JSON):
 {{
-  "event_type": "accident | outage | repair | other",
-  "relevance": 0.0-1.0 (0.8+ для серьезных аварий),
+  "event_type": "accident | outage | repair | tender | other",
+  "relevance": 0.0-1.0,
   "urgency": 1-5,
   "object": "water | heat | industrial | unknown",
   "why": "Причина решения",
-  "action": "call | watch | ignore"
+  "action": "call | watch | ignore",
+  "tender_deadline": "дата или null",
+  "tender_amount": "сумма или null",
+  "tender_customer": "заказчик или null"
 }}"""
 
     def _parse_response(self, content: str) -> Optional[LLMResponse]:

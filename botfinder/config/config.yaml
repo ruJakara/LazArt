@@ -53,6 +53,21 @@ keywords:
       - "простой"
       - "технологический сбой"
       - "остановка производства"
+    stage_early:
+      - "произошла авария"
+      - "остались без"
+      - "отключили"
+      - "остановлена"
+    stage_late:
+      - "устранили"
+      - "восстановили"
+      - "возобновили"
+    tenders:
+      - "тендер"
+      - "закупка"
+      - "аукцион"
+      - "конкурс"
+      - "торги"
   negative:
     - "ДТП"
     - "дорожно-транспортное происшествие"
@@ -77,6 +92,22 @@ weights:
   infrastructure: 4
   industrial: 2
   negative: -5
+  stage_early: 1
+  stage_late: -1
+  tenders: 3
+
+# --- Geography ---
+geography:
+  city_to_region:
+    "Йошкар-Ола": "Марий Эл"
+    "Калининград": "Калининградская область"
+    "Маршала Захарова": "СПб"
+  priority_regions:
+    - Sverdlovsk
+    - Chelyabinsk
+    - Perm
+    - HMAO
+  priority_bonus: 1
 
 # --- Thresholds ---
 thresholds:
@@ -594,4 +625,11 @@ sources:
     type: "rss"
     name: "Росводоканал – Новости"
     url: "https://rosvodokanal.ru/rss/news/"
+    region_hint: "Federal"
+
+  # --- ТЕНДЕРЫ ---
+  - id: "tender_001"
+    type: "rss"
+    name: "Bicotender.ru – Все тендеры"
+    url: "https://www.bicotender.ru/rss/tenders.xml"
     region_hint: "Federal"

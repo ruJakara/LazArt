@@ -28,11 +28,15 @@ class KeywordFilter:
         self,
         keywords: KeywordsConfig,
         weights: WeightsConfig,
-        threshold: int = 4
+        threshold: int = 4,
+        priority_regions: list = None,
+        priority_bonus: int = 1
     ):
         self.keywords = keywords
         self.weights = weights
         self.threshold = threshold
+        self.priority_regions = priority_regions or []
+        self.priority_bonus = priority_bonus
     
     def score(self, text: str) -> FilterResult:
         """
@@ -109,7 +113,8 @@ class KeywordFilter:
         object_categories: List[str] = None,
         strong_event_override_enabled: bool = False,
         strong_event_override_phrases: List[str] = None,
-        trace_id: str = ""
+        trace_id: str = "",
+        region: str = None
     ) -> Tuple[bool, FilterResult, str]:
         """
         Determine if article should be sent to LLM.
@@ -129,6 +134,25 @@ class KeywordFilter:
         """
         combined = f"{title} {text}"
         result = self.score(combined)
+        
+        # Geography bonus: +N for priority region
+        geo_bonus = 0
+        if region and self.priority_regions:
+            if region in self.priority_regions:
+                geo_bonus = self.priority_bonus
+                result = FilterResult(
+                    score=result.score + geo_bonus,
+                    positive_matches=result.positive_matches,
+                    negative_matches=result.negative_matches,
+                    passed=result.score + geo_bonus >= self.threshold,
+                    categories_matched=result.categories_matched
+                )
+                logger.debug(
+                    "filter1_geo_bonus",
+                    trace_id=trace_id,
+                    region=region,
+                    bonus=geo_bonus
+                )
         
         # Default decision code
         decision_code = "PASSED" if result.passed else "FILTER1_BELOW_THRESHOLD"

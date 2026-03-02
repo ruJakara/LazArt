@@ -110,15 +110,19 @@ class RSSFetcher:
     
     async def _fetch_google_news(self, source: SourceConfig) -> List[Dict[str, Any]]:
         """Fetch Google News RSS by query."""
-        if not source.query:
+        if not source.query and not source.url:
             return []
         
-        # Build Google News RSS URL
-        encoded_query = quote_plus(source.query)
-        url = (
-            f"https://news.google.com/rss/search?"
-            f"q={encoded_query}&hl={source.hl}&gl={source.gl}&ceid={source.ceid}"
-        )
+        if source.url:
+            # Direct URL mode (from config)
+            url = source.url
+        else:
+            # Build Google News RSS URL from query
+            encoded_query = quote_plus(source.query)
+            url = (
+                f"https://news.google.com/rss/search?"
+                f"q={encoded_query}&hl={source.hl}&gl={source.gl}&ceid={source.ceid}"
+            )
         
         # Create temporary source with URL
         temp_source = SourceConfig(
@@ -129,7 +133,43 @@ class RSSFetcher:
             region_hint=source.region_hint
         )
         
-        return await self._fetch_rss(temp_source)
+        items = await self._fetch_rss(temp_source)
+        
+        # Resolve Google redirect URLs to original source URLs
+        if items:
+            resolved = await self._resolve_google_urls(items)
+            return resolved
+        
+        return items
+    
+    async def _resolve_google_url(self, url: str) -> str:
+        """Follow Google News redirect to get original article URL."""
+        try:
+            async with httpx.AsyncClient(
+                timeout=5, follow_redirects=True, max_redirects=5
+            ) as client:
+                resp = await client.head(url)
+                return str(resp.url)
+        except Exception:
+            return url
+    
+    async def _resolve_google_urls(self, items: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """Resolve all Google redirect URLs in items."""
+        semaphore = asyncio.Semaphore(5)
+        
+        async def resolve_item(item):
+            url = item.get("url", "")
+            if "news.google.com" in url:
+                async with semaphore:
+                    item["url"] = await self._resolve_google_url(url)
+            return item
+        
+        results = await asyncio.gather(
+            *[resolve_item(item) for item in items],
+            return_exceptions=True
+        )
+        
+        return [r for r in results if isinstance(r, dict)]
     
     def _parse_entry(self, entry, source: SourceConfig) -> Optional[Dict[str, Any]]:
         """Parse RSS entry to standard format."""

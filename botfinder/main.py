@@ -42,6 +42,12 @@ async def process_news_cycle(broadcaster: Optional[Broadcaster] = None):
     settings = get_settings()
     config = get_config()
     
+    # Initialize region detector with config geography mappings
+    from region import get_region_detector
+    detector = get_region_detector()
+    if config.geography.city_to_region:
+        detector.add_mappings(config.geography.city_to_region)
+    
     # Acquire processing lock
     instance_id = str(uuid.uuid4())[:8]
     async with get_session() as session:
@@ -211,7 +217,9 @@ async def process_news_cycle(broadcaster: Optional[Broadcaster] = None):
         keyword_filter = KeywordFilter(
             keywords=config.keywords,
             weights=config.weights,
-            threshold=config.thresholds.filter1_to_llm
+            threshold=config.thresholds.filter1_to_llm,
+            priority_regions=config.geography.priority_regions,
+            priority_bonus=config.geography.priority_bonus
         )
         
         llm_client = LLMClient(settings)
@@ -308,7 +316,8 @@ async def process_news_cycle(broadcaster: Optional[Broadcaster] = None):
                     object_categories=config.filter1_gate.object_categories_required,
                     strong_event_override_enabled=config.filter1_gate.strong_event_override_enabled,
                     strong_event_override_phrases=config.filter1_gate.strong_event_override_phrases,
-                    trace_id=trace_id
+                    trace_id=trace_id,
+                    region=item.get("region")
                 )
                 
                 logger.info(

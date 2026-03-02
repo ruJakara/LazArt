@@ -67,6 +67,11 @@ class RegionDetector:
         except Exception as e:
             logger.warning("load_city_mappings_error", error=str(e))
     
+    def add_mappings(self, mappings: dict) -> None:
+        """Add city to region mappings from config dict."""
+        for city, region in mappings.items():
+            self._default_mappings[city.lower()] = region
+    
     def detect(
         self,
         text: str,

@@ -32,6 +32,9 @@ class WeightsConfig(BaseModel):
     infrastructure: int = 4
     industrial: int = 2
     negative: int = -5
+    stage_early: int = 1
+    stage_late: int = -1
+    tenders: int = 3
 
 
 class ThresholdsConfig(BaseModel):
@@ -112,6 +115,13 @@ class Filter1GateConfig(BaseModel):
         "затопление", "ЧП на объекте", "массовое отключение", "разлив нефти",
         "взрыв на производстве", "обрушение", "пожар на объекте"
     ])
+
+
+class GeographyConfig(BaseModel):
+    """Geography scoring settings."""
+    city_to_region: Dict[str, str] = Field(default_factory=dict)
+    priority_regions: list[str] = Field(default_factory=list)
+    priority_bonus: int = 1
 
 
 class LLMThrottleConfig(BaseModel):
@@ -199,6 +209,7 @@ class AppConfig(BaseModel):
     filter1_gate: Filter1GateConfig = Field(default_factory=Filter1GateConfig)
     llm_throttle: LLMThrottleConfig = Field(default_factory=LLMThrottleConfig)
     priority_score: PriorityScoreConfig = Field(default_factory=PriorityScoreConfig)
+    geography: GeographyConfig = Field(default_factory=GeographyConfig)
     ui: UIConfig = Field(default_factory=UIConfig)
 
 
