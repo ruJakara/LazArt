@@ -6,6 +6,7 @@ import os
 from pathlib import Path
 
 from aiogram import Bot, Dispatcher
+from aiogram.types import BotCommand
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiohttp import web
 
@@ -45,6 +46,10 @@ async def main() -> None:
     await init_db()
 
     bot = Bot(token=settings.bot_token)
+    await bot.set_my_commands([
+        BotCommand(command="start", description="Перезапустить бота"),
+        BotCommand(command="menu", description="Показать меню"),
+    ])
     dp = Dispatcher(storage=MemoryStorage())
 
     # Register routers — order matters for FSM priority

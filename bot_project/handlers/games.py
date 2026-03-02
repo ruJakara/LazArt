@@ -105,12 +105,17 @@ async def cmd_start(message: Message) -> None:
     games = load_games()
     enabled = [g for g in games if g.get("enabled")]
 
+    # Всегда показываем reply-клавиатуру (меню)
+    await message.answer(
+        "👋 Привет! Я бот школы LazArt.\n\nВыбери действие в меню ⬇️",
+        reply_markup=main_keyboard(is_known),
+    )
+
     if enabled:
         first_game = enabled[0]
         session_id = str(uuid.uuid4())
         await message.answer(
-            "👋 Привет! Я бот школы LazArt.\n\n"
-            "Сначала — сыграй 60 секунд! 🎮",
+            "А для начала — сыграй 60 секунд! 🎮",
             reply_markup=play_game_keyboard(first_game["id"], session_id),
         )
         await track("game.opened", message.from_user.id, {
@@ -118,11 +123,19 @@ async def cmd_start(message: Message) -> None:
             "session_id": session_id,
             "source": "start",
         })
-    else:
-        await message.answer(
-            "👋 Привет! Я бот школы LazArt.\n\nВыбери действие в меню:",
-            reply_markup=main_keyboard(is_known),
-        )
+
+
+# ---------------------------------------------------------------------------
+# /menu
+# ---------------------------------------------------------------------------
+
+@router.message(Command("menu"))
+async def cmd_menu(message: Message) -> None:
+    user = await get_or_create_user(message.from_user.id, message.from_user.username)
+    await message.answer(
+        "🧭 Главное меню:",
+        reply_markup=main_keyboard(bool(user.phone)),
+    )
 
 
 # ---------------------------------------------------------------------------
