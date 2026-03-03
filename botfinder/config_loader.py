@@ -27,6 +27,9 @@ class KeywordsConfig(BaseModel):
 
 class WeightsConfig(BaseModel):
     """Scoring weights."""
+    oil_gas: int = 6
+    chem_industry: int = 5
+    production: int = 6
     accident: int = 3
     repair: int = 2
     infrastructure: int = 4
