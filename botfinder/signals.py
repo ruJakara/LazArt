@@ -84,6 +84,15 @@ def format_signal_message(
     region_display = region or "не определён"
     
     # Strict format — exactly 6 lines, no extras
+    if event_type == "tender":
+        return (
+            f"🚨 ТЕНДЕР | {title_clean} | {urgency}/5\n"
+            f"Регион: {region_display}\n"
+            f"Сфера: {sphere}\n"
+            f"Подробности: {why_clean}\n"
+            f"Источник: {url}"
+        )
+    
     return (
         f"🚨 СИГНАЛ | {event_type_ru} | {urgency}/5\n"
         f"Регион: {region_display}\n"

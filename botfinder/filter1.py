@@ -135,24 +135,20 @@ class KeywordFilter:
         combined = f"{title} {text}"
         result = self.score(combined)
         
-        # Geography bonus: +N for priority region
-        geo_bonus = 0
+        # Apply geography bonus
         if region and self.priority_regions:
-            if region in self.priority_regions:
-                geo_bonus = self.priority_bonus
-                result = FilterResult(
-                    score=result.score + geo_bonus,
-                    positive_matches=result.positive_matches,
-                    negative_matches=result.negative_matches,
-                    passed=result.score + geo_bonus >= self.threshold,
-                    categories_matched=result.categories_matched
-                )
-                logger.debug(
-                    "filter1_geo_bonus",
-                    trace_id=trace_id,
-                    region=region,
-                    bonus=geo_bonus
-                )
+            region_lower = region.lower()
+            for pr in self.priority_regions:
+                if pr.lower() in region_lower or region_lower in pr.lower():
+                    result = FilterResult(
+                        score=result.score + self.priority_bonus,
+                        positive_matches=result.positive_matches,
+                        negative_matches=result.negative_matches,
+                        passed=result.score + self.priority_bonus >= self.threshold,
+                        categories_matched=result.categories_matched + ["priority_region"]
+                    )
+                    logger.info("filter1_geo_bonus", trace_id=trace_id, region=region, bonus=self.priority_bonus)
+                    break
         
         # Default decision code
         decision_code = "PASSED" if result.passed else "FILTER1_BELOW_THRESHOLD"

@@ -123,60 +123,85 @@ weights:
   oil_gas: 6
   chem_industry: 5
   production: 6
-  infrastructure: 3
   accident: 3
   repair: 2
+  infrastructure: 4
   industrial: 2
-  negative: -5
   stage_early: 1
   stage_late: -1
   tenders: 3
+  negative: -5
 
-# --- Geography ---
+# --- Thresholds ---
+thresholds:
+  filter1_to_llm: 2
+  llm_relevance: 0.6
+  llm_urgency: 3
+
+# --- Geography Scoring ---
 geography:
-  priority_regions:
-    - KhMAO_YANAO      # ⭐⭐⭐⭐⭐⭐
-    - Krasnoyarsk      # ⭐⭐⭐⭐⭐
-    - Irkutsk          # ⭐⭐⭐⭐⭐
-    - Chelyabinsk      # ⭐⭐⭐⭐⭐
-    - Tyumen           # ⭐⭐⭐⭐⭐
-    - Sverdlovsk       # ⭐⭐⭐⭐⭐
-    - Tatarstan        # ⭐⭐⭐⭐
-    - Bashkiria        # ⭐⭐⭐⭐
-    - Yakutia          # ⭐⭐⭐⭐
-    - Perm             # ⭐⭐⭐
-    - Kurgan           # ⭐⭐⭐
-    - UrFO             # ⭐⭐⭐
-    - KhMAO            # ⭐⭐⭐
-    - YANAO            # ⭐⭐⭐
-    - Siberia          # ⭐⭐⭐
-  priority_bonus: 2
-
   city_to_region:
     "Йошкар-Ола": "Марий Эл"
     "Калининград": "Калининградская область"
     "Маршала Захарова": "СПб"
-    "Нижневартовск": "KhMAO"
-    "Сургут": "KhMAO"
-    "Ноябрьск": "YANAO"
-    "Норильск": "Krasnoyarsk"
-    "Магнитогорск": "Chelyabinsk"
-    "Нижний Тагил": "Sverdlovsk"
-    "Стерлитамак": "Bashkiria"
-    "Нефтеюганск": "KhMAO"
-    "Тобольск": "Tyumen"
+    "Норильск": "Красноярский край"
+    "Магнитогорск": "Челябинская область"
+    "Нижний Тагил": "Свердловская область"
+    "Сургут": "ХМАО"
+    "Нижневартовск": "ХМАО"
+    "Новый Уренгой": "ЯНАО"
+    "Ноябрьск": "ЯНАО"
+  priority_regions:
+    - Sverdlovsk
+    - Chelyabinsk
+    - Perm
+    - HMAO
+    - YANAO
+    - Krasnoyarsk
+    - Irkutsk
+    - Novosibirsk
+  priority_bonus: 1
 
-# --- Thresholds ---
-thresholds:
-  filter1_to_llm: 4
-  llm_relevance: 0.6
-  llm_urgency: 3
+# --- Filter1 Gate (combo rule) ---
+filter1_gate:
+  require_combo_to_llm: true
+  event_categories_required:
+    - accident
+    - repair
+    - oil_gas
+    - chem_industry
+    - production
+    - stage_early
+    - tenders
+  object_categories_required:
+    - infrastructure
+    - industrial
+    - oil_gas
+    - chem_industry
+    - production
+    - tenders
+  strong_event_override_enabled: true
+  strong_event_override_phrases:
+    - "авария на водоканале"
+    - "прорыв трубопровода"
+    - "отключение отопления"
+    - "затопление"
+    - "ЧП на объекте"
+    - "массовое отключение"
+    - "разлив нефти"
+    - "взрыв на производстве"
+    - "обрушение"
+    - "пожар на объекте"
+    - "авария на производстве"
+    - "затопление шахты"
+    - "остановка НПЗ"
+    - "ГНВП"
 
 # --- RSS Sources ---
 sources:
 # СЕВЕР/СИБИРЬ — НЕФТЕГАЗ + ХИМПРОМ (основной рынок)
   - id: "north_001"
-    name: "KP.ru Тюмень – Происшествия" 
+    name: "KP.ru Тюмень – Происшествия"
     url: "https://www.tumen.kp.ru/rss/proisshestviya/"  # ✅ Работает
     region: "Tyumen"
 
@@ -804,6 +829,105 @@ sources:
     name: "Росводоканал – Новости"
     url: "https://rosvodokanal.ru/rss/news/"
     region_hint: "Federal"
+
+  # --- ТЕНДЕРЫ ---
+  - id: "tender_001"
+    type: "rss"
+    name: "zakupki.gov.ru — Насосы"
+    url: "https://zakupki.gov.ru/epz/orderNotice/xml/commonNoticeList/rss.xml?searchString=насос"
+    region_hint: "Federal"
+
+  - id: "tender_002"
+    type: "rss"
+    name: "zakupki.gov.ru — Двигатели"
+    url: "https://zakupki.gov.ru/epz/orderNotice/xml/commonNoticeList/rss.xml?searchString=двигатель"
+    region_hint: "Federal"
+
+  - id: "tender_003"
+    type: "rss"
+    name: "neftegaz.ru — Тендеры"
+    url: "https://neftegaz.ru/market/catalog/rss.xml"
+    region_hint: "Federal"
+
+  - id: "tender_004"
+    type: "rss"
+    name: "etp-ekb.ru — Свердловская обл"
+    url: "https://etp-ekb.ru/rss/tenders.xml"
+    region_hint: "Sverdlovsk"
+
+  # --- ПРОМЫШЛЕННЫЕ RSS ПО РЕГИОНАМ ---
+  # Красноярский край
+  - id: "kras_prod_001"
+    type: "rss"
+    name: "Newslab.ru – Красноярск промышленность"
+    url: "https://newslab.ru/rss/business/"
+    region_hint: "Krasnoyarsk"
+
+  - id: "kras_prod_002"
+    type: "rss"
+    name: "Vesti-k.ru – Красноярск ЧП"
+    url: "https://vesti-k.ru/rss/incident/"
+    region_hint: "Krasnoyarsk"
+
+  - id: "kras_prod_003"
+    type: "rss"
+    name: "Nornickel.ru – Новости"
+    url: "https://www.nornickel.ru/rss/news/"
+    region_hint: "Krasnoyarsk"
+
+  - id: "kras_prod_004"
+    type: "rss"
+    name: "Rusal.ru – Производство"
+    url: "https://rusal.ru/rss/press/"
+    region_hint: "Krasnoyarsk"
+
+  # Иркутская область
+  - id: "irk_prod_001"
+    type: "rss"
+    name: "Irk.ru – Иркутск промышленность"
+    url: "https://irk.ru/rss/business/"
+    region_hint: "Irkutsk"
+
+  - id: "irk_prod_002"
+    type: "rss"
+    name: "Baikal24.ru – Производство"
+    url: "https://baikal24.ru/rss/economy/"
+    region_hint: "Irkutsk"
+
+  # Новосибирская область
+  - id: "nvs_prod_001"
+    type: "rss"
+    name: "NGS.ru – Бизнес/Производство"
+    url: "https://ngs.ru/rss/business/"
+    region_hint: "Novosibirsk"
+
+  # ХМАО
+  - id: "khmao_prod_001"
+    type: "rss"
+    name: "Neftegaz.ru – Производство"
+    url: "https://neftegaz.ru/rss/production/"
+    region_hint: "KhMAO"
+
+  # ЯНАО
+  - id: "yanao_prod_001"
+    type: "rss"
+    name: "Novatek.ru – Ямал СПГ"
+    url: "https://www.novatek.ru/rss/news/"
+    region_hint: "YANAO"
+
+  # Челябинская область
+  - id: "chelyab_prod_001"
+    type: "rss"
+    name: "74.ru – Бизнес"
+    url: "https://74.ru/rss/business/"
+    region_hint: "Chelyabinsk"
+
+  # Свердловская область
+  - id: "sverdl_prod_001"
+    type: "rss"
+    name: "EAN – Свердловская область"
+    url: "https://eanews.ru/rss"
+    region_hint: "Sverdlovsk"
 
   # --- ТЕНДЕРЫ ---
   - id: "tender_001"
