@@ -33,10 +33,10 @@ class LLMClient:
     def __init__(self, settings: Settings):
         self.settings = settings
         # Strict "Free Models Only" policy by default
-        self.primary_model = "google/gemini-2.0-flash-exp:free"
+        # Verified working 2026-03-04 via OpenRouter API test
+        self.primary_model = "google/gemma-3-27b-it:free"
         self.fallback_models = [
-            "meta-llama/llama-3.2-11b-vision-instruct:free",
-            "microsoft/phi-3-medium-128k-instruct:free"
+            "google/gemma-3-12b-it:free",
         ]
         
         # Current state
