@@ -41,6 +41,14 @@ class LLMClient:
         
         # Current state
         self.active_model = self.primary_model
+    
+    def is_available(self) -> tuple[bool, str]:
+        """Check if LLM is available for requests."""
+        if not self.settings.openrouter_api_key:
+            return False, "NO_API_KEY"
+        if CircuitBreaker.is_open():
+            return False, "CIRCUIT_OPEN"
+        return True, "OK"
         
     async def analyze(
         self,
