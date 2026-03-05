@@ -33,10 +33,13 @@ class LLMClient:
     def __init__(self, settings: Settings):
         self.settings = settings
         # Strict "Free Models Only" policy by default
-        # Verified working 2026-03-04 via OpenRouter API test
-        self.primary_model = "google/gemma-3-27b-it:free"
+        # Verified working 2026-03-05: hermes-3 is NOT rate-limited
+        # Google Gemma free models are ALL 429 rate-limited upstream
+        self.primary_model = "nousresearch/hermes-3-llama-3.1-405b:free"
         self.fallback_models = [
-            "google/gemma-3-12b-it:free",
+            "mistralai/mistral-small-3.1-24b-instruct:free",
+            "meta-llama/llama-3.3-70b-instruct:free",
+            "google/gemma-3-27b-it:free",
         ]
         
         # Current state
