@@ -384,3 +384,78 @@ async def handle_ui_callback(callback: CallbackQuery):
 
     # Fallback
     await callback.answer()
+
+
+# ──────── Signal feedback handler ──────────
+
+@router.callback_query(F.data.startswith("fb1:"))
+async def handle_signal_feedback(callback: CallbackQuery):
+    """Handle 👍/👎 feedback on signals."""
+    parts = callback.data.split(":")
+    if len(parts) != 3:
+        await callback.answer()
+        return
+    
+    _, action, signal_id_str = parts
+    
+    try:
+        signal_id = int(signal_id_str)
+    except ValueError:
+        await callback.answer()
+        return
+    
+    # Determine score delta
+    if action == "good":
+        delta = 1
+        emoji = "👍"
+        toast = "✅ Спасибо за оценку!"
+    elif action == "bad":
+        delta = -1
+        emoji = "👎"
+        toast = "📝 Учтём, спасибо!"
+    else:
+        await callback.answer()
+        return
+    
+    # Update feedback_score in DB
+    try:
+        from sqlalchemy import update as sql_update
+        from models import Signal
+        
+        async with get_session() as session:
+            await session.execute(
+                sql_update(Signal)
+                .where(Signal.id == signal_id)
+                .values(feedback_score=Signal.feedback_score + delta)
+            )
+            await session.commit()
+        
+        logger.info(
+            "signal_feedback",
+            signal_id=signal_id,
+            action=action,
+            user_id=callback.from_user.id
+        )
+        
+        # Update keyboard to show user's choice
+        new_kb = InlineKeyboardMarkup(inline_keyboard=[[
+            InlineKeyboardButton(
+                text=f"{'✅ ' if action == 'good' else ''}👍",
+                callback_data=f"fb1:good:{signal_id}"
+            ),
+            InlineKeyboardButton(
+                text=f"{'✅ ' if action == 'bad' else ''}👎",
+                callback_data=f"fb1:bad:{signal_id}"
+            ),
+        ]])
+        
+        try:
+            await callback.message.edit_reply_markup(reply_markup=new_kb)
+        except Exception:
+            pass  # Message might be too old to edit
+        
+        await callback.answer(toast)
+        
+    except Exception as e:
+        logger.error("feedback_error", signal_id=signal_id, error=str(e))
+        await callback.answer("⚠️ Ошибка, попробуйте позже")

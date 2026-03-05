@@ -170,8 +170,8 @@ class Broadcaster:
         
         for subscriber in subscribers:
             try:
-                # Attach keyboard only for admin
-                reply_markup = admin_kb if subscriber.chat_id == admin_id else None
+                # Attach feedback keyboard to all users
+                reply_markup = admin_kb
                 
                 await self.bot.send_message(
                     chat_id=subscriber.chat_id,

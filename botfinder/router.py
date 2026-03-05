@@ -1,5 +1,6 @@
 """Main bot router setup."""
 from aiogram import Bot, Dispatcher, Router
+from aiogram.types import BotCommand
 
 from user import router as user_router
 from admin import router as admin_router
@@ -7,6 +8,15 @@ from ui_callbacks import router as ui_router
 from logging_setup import get_logger
 
 logger = get_logger("bot.router")
+
+
+# Persistent menu commands (visible at bottom of chat)
+BOT_COMMANDS = [
+    BotCommand(command="menu", description="📊 Панель управления"),
+    BotCommand(command="status", description="📡 Статус подписки"),
+    BotCommand(command="help", description="❓ Помощь"),
+    BotCommand(command="stop", description="🔴 Отписаться"),
+]
 
 
 def setup_routers(dp: Dispatcher) -> None:
@@ -25,5 +35,9 @@ async def create_bot(token: str) -> tuple[Bot, Dispatcher]:
     dp = Dispatcher()
     
     setup_routers(dp)
+    
+    # Register persistent menu commands
+    await bot.set_my_commands(BOT_COMMANDS)
+    logger.info("bot_commands_set", commands=[c.command for c in BOT_COMMANDS])
     
     return bot, dp
