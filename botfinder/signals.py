@@ -154,9 +154,9 @@ def create_signal_from_llm(
             title=title,
             urgency=llm_response.urgency,
             url=url,
-            tender_deadline=llm_response.tender_deadline,
-            tender_amount=llm_response.tender_amount,
-            tender_customer=llm_response.tender_customer
+            tender_deadline=getattr(llm_response, 'tender_deadline', None),
+            tender_amount=getattr(llm_response, 'tender_amount', None),
+            tender_customer=getattr(llm_response, 'tender_customer', None)
         )
     else:
         message = format_signal_message(
@@ -176,5 +176,68 @@ def create_signal_from_llm(
         "sphere": sphere,  # ЖКХ or промышленность
         "region": region,
         "why": truncate_field(llm_response.why, 300),
+        "message_text": message,
+    }
+
+
+def create_signal_from_filter1(
+    title: str,
+    url: str,
+    filter1_score: int,
+    categories_matched: list,
+    positive_matches: list,
+    region: Optional[str] = None
+) -> dict:
+    """
+    Create signal directly from filter1 results (LLM bypass mode).
+    
+    Infers event_type and object_type from matched categories.
+    """
+    # Infer event_type from categories
+    if "tenders" in categories_matched:
+        event_type = "tender"
+    elif "accident" in categories_matched:
+        event_type = "accident"
+    elif "repair" in categories_matched:
+        event_type = "repair"
+    else:
+        event_type = "other"
+    
+    # Infer object_type
+    if "infrastructure" in categories_matched:
+        object_type = "water"
+    elif "industrial" in categories_matched:
+        object_type = "industrial"
+    else:
+        object_type = "unknown"
+    
+    # Urgency from score: 2-3→3, 4-5→4, 6+→5
+    if filter1_score >= 6:
+        urgency = 5
+    elif filter1_score >= 4:
+        urgency = 4
+    else:
+        urgency = 3
+    
+    sphere = map_object_to_sphere(object_type)
+    why = f"Ключевые слова: {', '.join(positive_matches[:5])}"
+    
+    message = format_signal_message(
+        event_type=event_type,
+        urgency=urgency,
+        region=region,
+        object_type=object_type,
+        title=title,
+        why=why,
+        url=url
+    )
+    
+    return {
+        "event_type": event_type,
+        "urgency": urgency,
+        "object_type": object_type,
+        "sphere": sphere,
+        "region": region,
+        "why": why,
         "message_text": message,
     }

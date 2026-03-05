@@ -5,7 +5,7 @@ from filter1 import KeywordFilter, FilterResult, DEFAULT_KEYWORDS, DEFAULT_WEIGH
 from region import detect_region, RegionDetector
 from llm import LLMClient, LLMResponse, should_send_signal
 from decision import decide, SignalDecision, get_status_from_decision
-from signals import format_signal_message, create_signal_from_llm
+from signals import format_signal_message, create_signal_from_llm, create_signal_from_filter1
 from freshness import check_freshness, FreshnessResult
 from resolved import check_resolved, ResolvedResult
 from noise import check_noise, NoiseResult
@@ -17,7 +17,7 @@ __all__ = [
     "detect_region", "RegionDetector",
     "LLMClient", "LLMResponse", "should_send_signal",
     "decide", "SignalDecision", "get_status_from_decision",
-    "format_signal_message", "create_signal_from_llm",
+    "format_signal_message", "create_signal_from_llm", "create_signal_from_filter1",
     "check_freshness", "FreshnessResult",
     "check_resolved", "ResolvedResult",
     "check_noise", "NoiseResult",

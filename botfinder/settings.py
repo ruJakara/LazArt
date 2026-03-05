@@ -30,6 +30,7 @@ class Settings(BaseSettings):
         description="Database connection URL"
     )
     log_level: str = Field(default="INFO", description="Logging level")
+    skip_llm: bool = Field(default=False, description="Skip LLM filter, send signals from filter1 directly")
     
     model_config = {
         "env_file": str(Path(__file__).parent / ".env"),

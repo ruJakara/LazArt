@@ -16,6 +16,7 @@ from pipeline_pkg import (
     normalize_news_item, prepare_for_llm, Deduplicator, compute_simhash,
     KeywordFilter, detect_region, LLMClient, LLMResponse,
     decide, get_status_from_decision, create_signal_from_llm,
+    create_signal_from_filter1,
     check_freshness, check_resolved, check_noise
 )
 from bot_pkg import create_bot, Broadcaster
@@ -343,6 +344,112 @@ async def process_news_cycle(broadcaster: Optional[Broadcaster] = None):
                         )
                         await session.commit()
                     continue
+                
+                # ===== LLM BYPASS MODE =====
+                if settings.skip_llm:
+                    logger.info(
+                        "llm_bypassed",
+                        trace_id=trace_id,
+                        news_id=news_id,
+                        score=filter_result.score,
+                        matched=filter_result.positive_matches[:5]
+                    )
+                    
+                    signal_data = create_signal_from_filter1(
+                        title=item["title"],
+                        url=item["url"],
+                        filter1_score=filter_result.score,
+                        categories_matched=filter_result.categories_matched,
+                        positive_matches=filter_result.positive_matches,
+                        region=item.get("region")
+                    )
+                    
+                    # Update news status
+                    async with get_session() as session:
+                        await NewsRepository.update_status(
+                            session, news_id, "sent",
+                            filter1_score=filter_result.score,
+                            decision_code="LLM_BYPASSED"
+                        )
+                        await session.commit()
+                    
+                    # Check daily limit and send signal
+                    async with get_session() as session:
+                        signals_today = await SignalRepository.count_today(session)
+                    
+                    if signals_today >= config.limits.max_signals_per_day:
+                        logger.info("signal_limit_reached", news_id=news_id)
+                        async with get_session() as session:
+                            await NewsRepository.update_status(session, news_id, "suppressed_limit")
+                            await session.commit()
+                        continue
+                    
+                    # Check for similar recent signal (suppression)
+                    if broadcaster:
+                        async with get_session() as session:
+                            similar = await SignalRepository.find_similar_recent(
+                                session,
+                                event_type=signal_data["event_type"],
+                                region=signal_data["region"],
+                                object_type=signal_data["object_type"],
+                                hours=24
+                            )
+                            if similar:
+                                await NewsRepository.update_status(session, news_id, "suppressed_similar")
+                                await session.commit()
+                                logger.info("signal_suppressed_similar", news_id=news_id, similar_to=similar.id)
+                                continue
+                        
+                        async with get_session() as session:
+                            signal = await SignalRepository.try_create_if_under_limit(
+                                session,
+                                {
+                                    "news_id": news_id,
+                                    "sent_at": datetime.utcnow(),
+                                    "event_type": signal_data["event_type"],
+                                    "urgency": signal_data["urgency"],
+                                    "object_type": signal_data["object_type"],
+                                    "sphere": signal_data["sphere"],
+                                    "region": signal_data["region"],
+                                    "why": signal_data["why"],
+                                    "message_text": signal_data["message_text"],
+                                    "recipients_count": 0,
+                                },
+                                max_per_day=config.limits.max_signals_per_day,
+                                timezone_str=settings.app_timezone
+                            )
+                            
+                            if signal is None:
+                                await NewsRepository.update_status(session, news_id, "suppressed_limit")
+                                await session.commit()
+                                continue
+                            
+                            signal_id = signal.id
+                            await session.commit()
+                        
+                        recipients = await broadcaster.send_signal(
+                            signal_data["message_text"],
+                            signal_id=signal_id
+                        )
+                        
+                        async with get_session() as session:
+                            from sqlalchemy import update
+                            from db_pkg.models import Signal
+                            await session.execute(
+                                update(Signal).where(Signal.id == signal_id).values(recipients_count=recipients)
+                            )
+                            await session.commit()
+                        
+                        signals_sent += 1
+                        logger.info(
+                            "signal_sent_no_llm",
+                            news_id=news_id,
+                            signal_id=signal_id,
+                            recipients=recipients,
+                            score=filter_result.score
+                        )
+                    continue
+                # ===== END LLM BYPASS =====
                 
                 # Check if LLM is available
                 llm_available, llm_skip_reason = llm_client.is_available()
