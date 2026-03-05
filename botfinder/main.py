@@ -434,7 +434,7 @@ async def process_news_cycle(broadcaster: Optional[Broadcaster] = None):
                         
                         async with get_session() as session:
                             from sqlalchemy import update
-                            from db_pkg.models import Signal
+                            from models import Signal
                             await session.execute(
                                 update(Signal).where(Signal.id == signal_id).values(recipients_count=recipients)
                             )
@@ -579,7 +579,7 @@ async def process_news_cycle(broadcaster: Optional[Broadcaster] = None):
                     # Update recipients count
                     async with get_session() as session:
                         from sqlalchemy import update
-                        from db_pkg.models import Signal
+                        from models import Signal
                         await session.execute(
                             update(Signal).where(Signal.id == signal_id).values(recipients_count=recipients)
                         )
