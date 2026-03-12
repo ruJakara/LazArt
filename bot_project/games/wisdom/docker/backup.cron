@@ -1,0 +1,8 @@
+# Night Hunger Database Backup Cron Job
+# Add this to crontab with: crontab -e
+
+# Backup every day at 3:00 AM
+0 3 * * * /opt/night-hunger/docker/backup.sh 7 >> /var/log/night-hunger-backup.log 2>&1
+
+# Verify backup file exists (run at 4:00 AM)
+0 4 * * * test -f /var/backups/night_hunger/night_hunger_$(date +\%Y\%m\%d)_*.sql.gz || echo "Backup failed!" | mail -s "Night Hunger Backup Alert" admin@example.com

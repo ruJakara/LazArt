@@ -1,0 +1,16 @@
+{
+  "name": "apps/bot",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "python src/main.py",
+    "start": "python src/main.py",
+    "lint": "flake8 src/",
+    "format": "black src/"
+  },
+  "dependencies": {
+    "aiogram": "^3.4.1",
+    "aiohttp": "^3.9.1",
+    "redis": "^5.0.1"
+  }
+}
