@@ -1,0 +1,27 @@
+{
+  "checks": {
+    "hub_entry": true,
+    "open_upgrade": true,
+    "open_abilities": true,
+    "open_inventory": true,
+    "open_hunt": true,
+    "select_grot": true,
+    "enka_spent": true,
+    "event_battle": true,
+    "event_chest": true,
+    "event_victim": true,
+    "event_empty": true,
+    "final_choice": true,
+    "hunger_behavior": true,
+    "low_hunger_escape_locked": true,
+    "familiar_regular": true,
+    "familiar_bats": true,
+    "crystal_prompt": true,
+    "return_hub_with_cooldown": true,
+    "portrait_hub_and_battle": true,
+    "social_leaders_referrals_soon": true,
+    "player_hp_visible_in_critical_combat": true,
+    "no_core_regression_routes": true
+  },
+  "notes": []
+}

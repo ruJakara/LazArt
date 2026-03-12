@@ -1,0 +1,1 @@
+{"coordinateSystem":"UI-only app; no canvas. DOM origin is top-left, x→right, y→down.","route":"/leaderboard","user":{"id":100001,"level":6,"hp":{"current":140,"max":140},"xp":880,"blood":1200,"statPoints":3},"hunt":{"isHunting":false,"enemy":null,"canHunt":true,"combatLogTail":[]}}

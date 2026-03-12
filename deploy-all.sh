@@ -38,5 +38,13 @@ else
   echo "⚠️  kiberone-botfinder.service not found, skipping restart"
 fi
 
+# --- Night Hunger ---
+echo ""
+echo "🔄 Deploying night-hunger..."
+cd /opt/bots/lazart/night-hunger
+chmod +x deploy-bot.sh
+./deploy-bot.sh
+echo "✅ night-hunger deployed"
+
 echo ""
 echo "🎉 All bots updated!"

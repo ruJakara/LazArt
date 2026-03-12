@@ -1,0 +1,25 @@
+version: "3"
+
+tasks:
+  tree:
+    desc: Show project tree
+    cmds:
+      - pwsh -NoProfile -Command "Get-ChildItem -Recurse | ForEach-Object { $_.FullName }"
+
+  check:files:
+    desc: Verify required docs and skills exist
+    cmds:
+      - >
+        pwsh -NoProfile -Command "$required=@('README.md','docs/ai/project-map.md','docs/ai/architecture.md','docs/ai/workflow.md','docs/ai/rules.md','docs/ai/done-criteria.md','docs/ai/anti-patterns.md','docs/ai/glossary.md','skills/vk-audience-analysis.md','skills/vk-post-writer.md','skills/vk-content-director.md'); $missing=$required | Where-Object { -not (Test-Path $_) }; if ($missing.Count -gt 0) { Write-Error ('Missing files: ' + ($missing -join ', ')); exit 1 }; Write-Output 'Required files are present.'"
+
+  check:skills:
+    desc: Verify skill files contain required sections
+    cmds:
+      - >
+        pwsh -NoProfile -Command "$sections=@('## Title','## Purpose','## Scope','## Inputs','## Outputs','## Responsibilities','## Constraints','## What to avoid','## Typical tasks','## Quality checklist'); $files=Get-ChildItem 'skills' -File -Filter '*.md'; foreach($file in $files){ $content=Get-Content -Raw $file.FullName; $missing=@(); foreach($section in $sections){ if($content -notmatch [regex]::Escape($section)){ $missing += $section } }; if($missing.Count -gt 0){ Write-Error ('Missing sections in ' + $file.Name + ': ' + ($missing -join ', ')); exit 1 } }; Write-Output 'Skill files contain required sections.'"
+
+  check:
+    desc: Run all checks
+    deps:
+      - check:files
+      - check:skills

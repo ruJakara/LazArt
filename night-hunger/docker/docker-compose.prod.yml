@@ -1,0 +1,74 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: ../services/api
+      dockerfile: ../../docker/api/Dockerfile
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=${DATABASE_URL}
+      - REDIS_URL=${REDIS_URL}
+      - JWT_SECRET=${JWT_SECRET}
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN:-}
+    ports:
+      - "3000:3000"
+    depends_on:
+      - postgres
+      - redis
+    restart: unless-stopped
+
+  web:
+    build:
+      context: ../apps/web
+      dockerfile: ../../docker/web/Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - api
+    restart: unless-stopped
+
+  worker:
+    build:
+      context: ../services/worker
+      dockerfile: ../../docker/worker/Dockerfile
+    environment:
+      - NODE_ENV=production
+      - REDIS_URL=${REDIS_URL}
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN:-}
+    depends_on:
+      - redis
+    restart: unless-stopped
+
+  bot:
+    build:
+      context: ../apps/bot
+      dockerfile: ../../docker/bot/Dockerfile
+    environment:
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN:-}
+      - TELEGRAM_WEBAPP_URL=${TELEGRAM_WEBAPP_URL}
+      - WEB_APP_URL=${WEB_APP_URL:-}
+      - BOT_HEARTBEAT_INTERVAL_SECONDS=${BOT_HEARTBEAT_INTERVAL_SECONDS:-15}
+      - BOT_HEARTBEAT_STALE_AFTER_SECONDS=${BOT_HEARTBEAT_STALE_AFTER_SECONDS:-90}
+      - BOT_HEALTHCHECK_GRACE_SECONDS=${BOT_HEALTHCHECK_GRACE_SECONDS:-15}
+      - PYTHONUNBUFFERED=1
+    depends_on:
+      - api
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_USER=${DB_USERNAME:-postgres}
+      - POSTGRES_PASSWORD=${DB_PASSWORD:-password}
+      - POSTGRES_DB=${DB_NAME:-night_hunger}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+
+volumes:
+  pgdata:

@@ -28,6 +28,11 @@ echo Uploading .env files...
 scp botfinder\.env root@89.191.225.207:/opt/bots/lazart/botfinder/.env
 ssh root@89.191.225.207 "chmod 600 /opt/bots/lazart/botfinder/.env"
 
+REM Копируем .env для night-hunger
+echo Uploading night-hunger .env...
+scp night-hunger\.env root@89.191.225.207:/opt/bots/lazart/night-hunger/.env
+ssh root@89.191.225.207 "chmod 600 /opt/bots/lazart/night-hunger/.env"
+
 REM Устанавливаем service файлы в systemd
 ssh root@89.191.225.207 "cp /opt/bots/lazart/bot_project/kiberone-bot.service /etc/systemd/system/ && cp /opt/bots/lazart/botfinder/kiberone-botfinder.service /etc/systemd/system/ && systemctl daemon-reload"
 
