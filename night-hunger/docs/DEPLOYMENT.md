@@ -2,9 +2,9 @@
 
 ## Требования
 
-- Docker & Docker Compose
-- Доменное имя (для production)
-- SSL сертификат (рекомендуется)
+- Docker и Docker Compose
+- Доменное имя для production WebApp
+- HTTPS/SSL на хостовом nginx (Telegram WebApp требует публичный `https://` URL)
 
 ---
 
@@ -24,273 +24,164 @@ npm install
 cp .env.example .env
 ```
 
-Заполните `.env`:
+Минимум для локального запуска:
+
 ```env
 TELEGRAM_BOT_TOKEN=your_bot_token
-DATABASE_URL=postgresql://postgres:password@localhost:5432/night_hunger
-REDIS_URL=redis://localhost:6379
-JWT_SECRET=your_secret_key
+VITE_API_URL=/api
+VITE_APP_BASE_PATH=/
 ```
 
-### 3. Запуск Docker (PostgreSQL + Redis)
+### 3. Запуск разработки
 
 ```bash
-npm run docker:up
-```
-
-### 4. Запуск в режиме разработки
-
-```bash
-npm run dev
+npm run dev --prefix apps/web
+npm run build --prefix services/api
 ```
 
 Доступ:
-- Frontend: http://localhost:5173
-- Backend API: http://localhost:3000/api
+- Frontend: `http://localhost:5173`
+- Backend API: `http://localhost:3000/api`
 
 ---
 
 ## Production Deployment
 
-### Рекомендуемый быстрый запуск (текущий)
+### Архитектура server deploy
+
+`night-hunger` больше не использует GitHub Pages. Теперь production-схема такая:
+
+- docker `web` публикуется только на `127.0.0.1:8080`
+- docker `api` публикуется только на `127.0.0.1:3000`
+- хостовый nginx принимает внешний трафик и проксирует его на `127.0.0.1:8080`
+- `web` контейнер сам проксирует `/api` внутрь docker-сети на сервис `api`
+
+Это позволяет жить рядом с остальными проектами на VPS и не конфликтовать за хостовый `:80`.
+
+### 1. Настройка `.env`
 
 ```bash
 cp .env.example .env
-# заполнить TELEGRAM_BOT_TOKEN и TELEGRAM_WEBAPP_URL
+```
+
+Заполните минимум:
+
+```env
+TELEGRAM_BOT_TOKEN=your_bot_token
+TELEGRAM_WEBAPP_URL=https://your-night-hunger-domain.example/
+WEB_APP_URL=https://your-night-hunger-domain.example/
+FRONTEND_URL=https://your-night-hunger-domain.example/
+WEB_BIND_HOST=127.0.0.1
+WEB_PORT=8080
+API_BIND_HOST=127.0.0.1
+API_PORT=3000
+VITE_API_URL=/api
+VITE_APP_BASE_PATH=/
+DATABASE_URL=postgresql://postgres:password@localhost:5432/night_hunger?schema=public
+REDIS_URL=redis://localhost:6379
+JWT_SECRET=replace_with_strong_secret
+```
+
+### 2. Хостовый nginx
+
+Возьмите шаблон `deploy/nginx/night-hunger.conf.example` и установите его как site-конфиг nginx.
+
+Минимальный пример:
+
+```nginx
+server {
+  listen 80;
+  server_name your-night-hunger-domain.example;
+
+  location / {
+    proxy_pass http://127.0.0.1:8080;
+  }
+}
+```
+
+Дальше:
+
+1. Заменить `server_name` на реальный домен
+2. Включить сайт в nginx
+3. Проверить `nginx -t`
+4. Перезагрузить nginx
+5. Навесить HTTPS (Let's Encrypt или твой текущий reverse proxy)
+
+### 3. Запуск production stack
+
+```bash
 chmod +x deploy-bot.sh
 ./deploy-bot.sh
 ```
 
-Скрипт выполняет проверки окружения и запускает production compose (`docker/docker-compose.prod.yml`) с выводом статуса и логов `bot`.
-
----
-
-### Вариант 1: Docker Compose
-
-#### 1. Подготовка сервера
+Или вручную:
 
 ```bash
-# Установка Docker
-curl -fsSL https://get.docker.com -o get-docker.sh
-sh get-docker.sh
-
-# Установка Docker Compose
-apt-get install docker-compose-plugin
+docker-compose --env-file .env -f docker/docker-compose.prod.yml up -d --build
+docker-compose --env-file .env -f docker/docker-compose.prod.yml ps
 ```
 
-#### 2. Клонирование проекта
+### 4. Проверка
 
 ```bash
-git clone <repository-url>
-cd night-hunger
-```
-
-#### 3. Настройка окружения
-
-Создайте `.env.production`:
-```env
-NODE_ENV=production
-DATABASE_URL=postgresql://user:password@postgres:5432/night_hunger
-REDIS_URL=redis://redis:6379
-JWT_SECRET=your_super_secret_production_key
-TELEGRAM_BOT_TOKEN=your_bot_token
-DB_USERNAME=postgres
-DB_PASSWORD=your_db_password
-DB_NAME=night_hunger
-```
-
-#### 4. Запуск
-
-```bash
-docker-compose -f docker/docker-compose.prod.yml --env-file .env.production up -d --build
-```
-
-#### 5. Проверка
-
-```bash
-docker-compose -f docker/docker-compose.prod.yml ps
-docker-compose -f docker/docker-compose.prod.yml logs -f
-docker-compose -f docker/docker-compose.prod.yml logs -f bot
+docker-compose --env-file .env -f docker/docker-compose.prod.yml logs -f bot
+docker-compose --env-file .env -f docker/docker-compose.prod.yml logs -f web
+docker-compose --env-file .env -f docker/docker-compose.prod.yml logs -f api
+curl http://127.0.0.1:3000/api/health
 ```
 
 ---
 
-### Вариант 2: Kubernetes (для масштабирования)
+## Windows helper scripts
 
-#### 1. Создание манифестов
+В монорепе подготовлены команды под текущий VPS-паттерн соседних проектов:
 
-```yaml
-# k8s/api-deployment.yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: api
-spec:
-  replicas: 3
-  selector:
-    matchLabels:
-      app: api
-  template:
-    metadata:
-      labels:
-        app: api
-    spec:
-      containers:
-      - name: api
-        image: your-registry/night-hunger-api:latest
-        ports:
-        - containerPort: 3000
-        env:
-        - name: NODE_ENV
-          value: "production"
-        - name: DATABASE_URL
-          valueFrom:
-            secretKeyRef:
-              name: db-secret
-              key: url
-```
+- `.vscode/tasks.json`:
+  - `Deploy night-hunger`
+  - `Status night-hunger`
+- `deploy-nighthunger.bat`
+- `upload-to-server.bat`
 
-#### 2. Применение
+`upload-to-server.bat` теперь также копирует шаблон nginx-конфига для `night-hunger` на сервер:
 
-```bash
-kubectl apply -f k8s/
-```
-
----
-
-## CI/CD (GitHub Actions)
-
-### .github/workflows/deploy.yml
-
-```yaml
-name: Deploy
-
-on:
-  push:
-    branches: [main]
-
-jobs:
-  build-and-deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-      
-      - name: Install dependencies
-        run: npm ci
-      
-      - name: Build
-        run: npm run build
-      
-      - name: Test
-        run: npm test
-      
-      - name: Deploy to server
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SSH_KEY }}
-          script: |
-            cd /path/to/night-hunger
-            git pull
-            docker-compose -f docker/docker-compose.prod.yml up -d --build
-```
-
----
-
-## Мониторинг
-
-### Health Check
-
-```bash
-curl http://localhost:3000/api/health
-```
-
-### Логи
-
-```bash
-# API
-docker-compose -f docker/docker-compose.prod.yml logs -f api
-
-# Web
-docker-compose -f docker/docker-compose.prod.yml logs -f web
-
-# Worker
-docker-compose -f docker/docker-compose.prod.yml logs -f worker
-
-# Bot
-docker-compose -f docker/docker-compose.prod.yml logs -f bot
-```
-
-### Метрики
-
-- PostgreSQL: `pg_stat_activity`, `pg_stat_database`
-- Redis: `INFO stats`, `INFO memory`
-- Node.js: Prometheus + Grafana
-
----
-
-## Backup Database
-
-### Создание бэкапа
-
-```bash
-docker-compose -f docker/docker-compose.prod.yml exec postgres pg_dump -U postgres night_hunger > backup.sql
-```
-
-### Восстановление
-
-```bash
-docker-compose -f docker/docker-compose.prod.yml exec -T postgres psql -U postgres night_hunger < backup.sql
-```
-
-### Автоматизация (cron)
-
-```bash
-# /etc/cron.daily/backup-night-hunger
-#!/bin/bash
-DATE=$(date +%Y%m%d_%H%M%S)
-docker-compose -f /opt/night-hunger/docker/docker-compose.prod.yml exec -T postgres pg_dump -U postgres night_hunger > /backups/night_hunger_$DATE.sql
-find /backups -name "night_hunger_*.sql" -mtime +7 -delete
+```text
+/opt/bots/lazart/night-hunger/deploy/nginx/night-hunger.conf.example
 ```
 
 ---
 
 ## Troubleshooting
 
+### Web не открывается из Telegram
+
+Проверьте:
+
+- `TELEGRAM_WEBAPP_URL` и `WEB_APP_URL` указывают на реальный `https://` домен
+- хостовый nginx проксирует на `127.0.0.1:8080`
+- `docker-compose ... ps` показывает `web` в состоянии `Up`
+
+### Frontend не достучался до API
+
+Проверьте:
+
+- `VITE_API_URL=/api`
+- proxy `/api` в `docker/web/nginx.conf`
+- `FRONTEND_URL` в `.env`
+- `api` контейнер доступен на `127.0.0.1:3000`
+
 ### API не запускается
 
+Проверьте:
+
 ```bash
-# Проверка логов
-docker-compose -f docker/docker-compose.prod.yml logs api
-
-# Проверка подключения к БД
-docker-compose -f docker/docker-compose.prod.yml exec api ping postgres
+docker-compose --env-file .env -f docker/docker-compose.prod.yml logs api
+docker-compose --env-file .env -f docker/docker-compose.prod.yml exec api printenv
 ```
-
-### Frontend не подключается к API
-
-Проверьте CORS настройки в `services/api/src/main.ts`.
 
 ### Redis недоступен
 
 ```bash
-docker-compose -f docker/docker-compose.prod.yml exec redis redis-cli ping
-# Ответ: PONG
+docker-compose --env-file .env -f docker/docker-compose.prod.yml exec redis redis-cli ping
 ```
 
----
-
-## Security Checklist
-
-- [ ] Измените все пароли по умолчанию
-- [ ] Используйте HTTPS (Let's Encrypt)
-- [ ] Настройте firewall (только нужные порты)
-- [ ] Регулярно обновляйте зависимости
-- [ ] Включите rate limiting
-- [ ] Настройте мониторинг безопасности
+Ожидаемый ответ: `PONG`

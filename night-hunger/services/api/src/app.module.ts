@@ -13,8 +13,10 @@ import { LeaderboardModule } from './modules/leaderboard/leaderboard.module';
 import { ReferralModule } from './modules/referral/referral.module';
 import { NotificationModule } from './modules/notification/notification.module';
 import { User, Inventory, GameLog, Referral, Item, Shop } from './database/entities';
+import { HealthController } from './health.controller';
 
 @Module({
+  controllers: [HealthController],
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,

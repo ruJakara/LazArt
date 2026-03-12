@@ -33,6 +33,11 @@ echo Uploading night-hunger .env...
 scp night-hunger\.env root@89.191.225.207:/opt/bots/lazart/night-hunger/.env
 ssh root@89.191.225.207 "chmod 600 /opt/bots/lazart/night-hunger/.env"
 
+REM Копируем шаблон reverse proxy для night-hunger
+echo Uploading night-hunger nginx template...
+ssh root@89.191.225.207 "mkdir -p /opt/bots/lazart/night-hunger/deploy/nginx"
+scp night-hunger\deploy\nginx\night-hunger.conf.example root@89.191.225.207:/opt/bots/lazart/night-hunger/deploy/nginx/night-hunger.conf.example
+
 REM Устанавливаем service файлы в systemd
 ssh root@89.191.225.207 "cp /opt/bots/lazart/bot_project/kiberone-bot.service /etc/systemd/system/ && cp /opt/bots/lazart/botfinder/kiberone-botfinder.service /etc/systemd/system/ && systemctl daemon-reload"
 
@@ -42,6 +47,7 @@ echo Upload complete!
 echo ====================================
 echo.
 echo Services installed and systemd reloaded.
-echo Run deploy-all.bat to deploy both bots.
+echo Night Hunger nginx template uploaded to /opt/bots/lazart/night-hunger/deploy/nginx/night-hunger.conf.example
+echo Run deploy-all.bat or deploy-nighthunger.bat after updating night-hunger/.env and nginx.
 echo.
 pause

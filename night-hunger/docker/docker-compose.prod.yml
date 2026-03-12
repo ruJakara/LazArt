@@ -11,8 +11,9 @@ services:
       - REDIS_URL=${REDIS_URL}
       - JWT_SECRET=${JWT_SECRET}
       - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN:-}
+      - FRONTEND_URL=${FRONTEND_URL:-}
     ports:
-      - "3000:3000"
+      - "${API_BIND_HOST:-127.0.0.1}:${API_PORT:-3000}:3000"
     depends_on:
       - postgres
       - redis
@@ -23,7 +24,7 @@ services:
       context: ../apps/web
       dockerfile: ../../docker/web/Dockerfile
     ports:
-      - "80:80"
+      - "${WEB_BIND_HOST:-127.0.0.1}:${WEB_PORT:-8080}:80"
     depends_on:
       - api
     restart: unless-stopped

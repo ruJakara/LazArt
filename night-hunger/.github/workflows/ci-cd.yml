@@ -185,7 +185,7 @@ jobs:
             
             # Health check
             sleep 10
-            curl -f http://localhost:3000/api/health || exit 1
+            curl -f http://127.0.0.1:3000/api/health || exit 1
           EOF
         env:
           PROD_DEPLOY_KEY: ${{ secrets.PROD_DEPLOY_KEY }}

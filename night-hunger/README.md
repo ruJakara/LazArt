@@ -10,18 +10,10 @@
   - extended API -> временный mock-контур для будущих модулей
 - `services/api` собирается с включенными модулями:
   - `auth`, `user`, `game`, `upgrade`, `inventory`, `shop`, `leaderboard`, `referral`, `notification`
-- Подтверждён локальный smoke для:
-  - `auth -> hunt -> action -> state`
-  - `upgrade -> inventory -> shop` (JWT smoke)
-- `leaderboard -> referral` работает в live-контуре (API + UI smoke, включая клики по кнопкам).
-- `notification + worker` queue-контур восстановлен (enqueue через API и обработка worker).
-- Расширенный backend-модуль `payment` остаётся вне активного контура.
-- Telegram delivery adapter в `worker` подключен; для фактической отправки нужен `TELEGRAM_BOT_TOKEN` в окружении `worker`.
-  - Для локального docker-smoke используйте `docker-compose --env-file .env ...`, чтобы token гарантированно подхватился.
-- Live smoke доставки в Telegram подтверждён 10.03.2026 (job завершён с `success=true`, получен `messageId`).
 - Локальный аварийный запуск бота: `run-bot-only.bat`.
-- Production запуск: `docker-compose -f docker/docker-compose.prod.yml up -d --build` (включает сервис `bot` с автоперезапуском).
-  - Рекомендуется запускать с явным env-файлом: `docker-compose --env-file .env -f docker/docker-compose.prod.yml up -d --build`.
+- Production web больше не завязан на GitHub Pages:
+  - frontend/API поднимаются на loopback-портах сервера (`127.0.0.1:8080` и `127.0.0.1:3000`)
+  - внешний доступ должен идти через хостовый nginx reverse proxy (`deploy/nginx/night-hunger.conf.example`)
 - Bot runtime hardening (24/7): heartbeat + watchdog внутри бота и Docker healthcheck (`src/healthcheck.py`).
 
 Подробный статус и диагностические команды: `STATUS.md`.
@@ -51,11 +43,18 @@ docker-compose --env-file .env -f docker/docker-compose.prod.yml logs -f bot
 powershell -ExecutionPolicy Bypass -File .\bot-health.ps1
 ```
 
+Для серверного front:
+
+1. Возьми шаблон `deploy/nginx/night-hunger.conf.example`.
+2. Замени `server_name` на свой домен.
+3. Проксируй трафик на `127.0.0.1:8080`.
+4. В `.env` укажи тот же HTTPS URL в `TELEGRAM_WEBAPP_URL`, `WEB_APP_URL` и `FRONTEND_URL`.
+
 ## Документация
 
-- `STATUS.md` — что работает, что сломано, где логи.
-- `BOT_ONLY.md` — минимальный запуск bot-only.
-- `DEVELOPMENT_PLAN.md` — recovery-план по этапам.
+- `STATUS.md` - что работает, что сломано, где логи.
+- `BOT_ONLY.md` - минимальный запуск bot-only.
+- `DEVELOPMENT_PLAN.md` - recovery-план по этапам.
 
 ## Архив
 

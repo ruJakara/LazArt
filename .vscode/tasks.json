@@ -4,7 +4,7 @@
     {
       "label": "Deploy All Bots",
       "type": "shell",
-      "command": "ssh root@89.191.225.207 '/opt/bots/deploy-all.sh'",
+      "command": "ssh root@89.191.225.207 'cd /opt/bots/lazart && bash deploy-all.sh'",
       "group": "build",
       "problemMatcher": [],
       "presentation": {
@@ -15,14 +15,21 @@
     {
       "label": "Deploy bot_project",
       "type": "shell",
-      "command": "ssh root@89.191.225.207 'cd /opt/bots/bot_project && ./deploy.sh'",
+      "command": "ssh root@89.191.225.207 'cd /opt/bots/lazart/bot_project && bash deploy.sh'",
       "group": "build",
       "problemMatcher": []
     },
     {
       "label": "Deploy botfinder",
       "type": "shell",
-      "command": "ssh root@89.191.225.207 'cd /opt/bots/botfinder && ./deploy.sh'",
+      "command": "ssh root@89.191.225.207 'cd /opt/bots/lazart/botfinder && bash deploy.sh'",
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "Deploy night-hunger",
+      "type": "shell",
+      "command": "ssh root@89.191.225.207 'cd /opt/bots/lazart/night-hunger && bash deploy-bot.sh'",
       "group": "build",
       "problemMatcher": []
     },
@@ -30,6 +37,13 @@
       "label": "Status all bots",
       "type": "shell",
       "command": "ssh root@89.191.225.207 'systemctl status kiberone-bot.service kiberone-botfinder.service --no-pager'",
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "Status night-hunger",
+      "type": "shell",
+      "command": "ssh root@89.191.225.207 'docker compose --env-file /opt/bots/lazart/night-hunger/.env -f /opt/bots/lazart/night-hunger/docker/docker-compose.prod.yml ps || docker-compose --env-file /opt/bots/lazart/night-hunger/.env -f /opt/bots/lazart/night-hunger/docker/docker-compose.prod.yml ps'",
       "group": "test",
       "problemMatcher": []
     }

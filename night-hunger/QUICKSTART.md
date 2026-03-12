@@ -7,10 +7,16 @@ Production запуск (always-on бот через Docker):
 1. Убедиться, что в `.env` заданы:
    - `TELEGRAM_BOT_TOKEN`
    - `TELEGRAM_WEBAPP_URL`
+   - `WEB_APP_URL`
+   - `FRONTEND_URL`
 2. Запустить:
    - `chmod +x deploy-bot.sh`
    - `./deploy-bot.sh`
-3. Проверить бот:
+3. Подключить хостовый nginx:
+   - взять `deploy/nginx/night-hunger.conf.example`
+   - заменить `server_name`
+   - проксировать на `127.0.0.1:8080`
+4. Проверить бот:
    - `docker-compose --env-file .env -f docker/docker-compose.prod.yml logs -f bot`
    - `powershell -ExecutionPolicy Bypass -File .\bot-health.ps1`
 
@@ -31,6 +37,8 @@ Production запуск (always-on бот через Docker):
    - `VITE_USE_MOCK_API=false`
    - `VITE_USE_MOCK_CORE_API=false`
    - `VITE_USE_MOCK_EXTENDED_API=true` (опционально, для будущих расширенных модулей)
+   - `VITE_API_URL=/api`
+   - `VITE_APP_BASE_PATH=/`
    - В этом режиме live: `auth/user/game/upgrade/inventory/shop/leaderboard/referral`
 3. Запустить `npm run dev --prefix apps/web`.
 
