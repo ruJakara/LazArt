@@ -95,12 +95,12 @@ keywords:
       - "устранили"
       - "восстановили"
       - "возобновили"
-    tenders:
-      - "тендер"
-      - "закупка"
-      - "аукцион"
-      - "конкурс"
-      - "торги"
+    # tenders:  # DISABLED until LLM is re-enabled
+    #   - "тендер"
+    #   - "закупка"
+    #   - "аукцион"
+    #   - "конкурс"
+    #   - "торги"
   negative:
     - "ДТП"
     - "дорожно-транспортное происшествие"
@@ -117,6 +117,29 @@ keywords:
     - "домашний"
     - "автомобиль"
     - "машина столкнулась"
+    # Политика / военные / международные
+    - "санкции"
+    - "Украина"
+    - "БПЛА"
+    - "атака дронов"
+    - "обстрел"
+    - "Минобороны"
+    - "ВСУ"
+    - "фронт"
+    - "Зеленский"
+    - "НАТО"
+    - "контрнаступление"
+    - "депутат"
+    - "Госдума"
+    - "выборы"
+    - "оппозиция"
+    - "митинг"
+    - "протест"
+    - "арест"
+    - "приговор суда"
+    - "Иран"
+    - "Израиль"
+    - "Ближний Восток"
 
 # --- Scoring Weights ---
 weights:
@@ -129,7 +152,7 @@ weights:
   industrial: 2
   stage_early: 1
   stage_late: -1
-  tenders: 3
+  # tenders: 3  # DISABLED
   negative: -5
 
 # --- Thresholds ---
@@ -137,6 +160,11 @@ thresholds:
   filter1_to_llm: 2
   llm_relevance: 0.6
   llm_urgency: 3
+
+# --- Limits ---
+limits:
+  max_signals_per_day: 10
+  max_processing_batch: 100
 
 # --- Geography Scoring ---
 geography:
@@ -172,7 +200,7 @@ filter1_gate:
     - chem_industry
     - production
     - stage_early
-    - tenders
+    # - tenders  # DISABLED
   object_categories_required:
     - infrastructure
     - industrial
