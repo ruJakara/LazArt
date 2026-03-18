@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-echo "🚀 Deploying all bots from LazArt monorepo..."
+echo "🚀 Deploying core projects from LazArt monorepo..."
 
 cd /opt/bots/lazart || { echo "❌ /opt/bots/lazart not found"; exit 1; }
 
@@ -23,21 +23,6 @@ else
   echo "⚠️  kiberone-bot.service not found, skipping restart"
 fi
 
-# --- BotFinder ---
-echo ""
-echo "🔄 Deploying botfinder..."
-cd /opt/bots/lazart/botfinder
-source venv/bin/activate
-pip install -r requirements.txt --quiet
-deactivate
-
-if systemctl list-unit-files | grep -q "kiberone-botfinder.service"; then
-  systemctl restart kiberone-botfinder.service
-  echo "✅ botfinder deployed"
-else
-  echo "⚠️  kiberone-botfinder.service not found, skipping restart"
-fi
-
 # --- Night Hunger ---
 echo ""
 echo "🔄 Deploying night-hunger..."
@@ -47,4 +32,4 @@ chmod +x deploy-bot.sh
 echo "✅ night-hunger deployed"
 
 echo ""
-echo "🎉 All bots updated!"
+echo "🎉 Core projects updated (bot_project + night-hunger)!"

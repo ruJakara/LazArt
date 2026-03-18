@@ -2,7 +2,7 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "Deploy All Bots",
+      "label": "Deploy Core Projects",
       "type": "shell",
       "command": "ssh root@89.191.225.207 'cd /opt/bots/lazart && bash deploy-all.sh'",
       "group": "build",
@@ -34,9 +34,16 @@
       "problemMatcher": []
     },
     {
-      "label": "Status all bots",
+      "label": "Status core projects",
       "type": "shell",
-      "command": "ssh root@89.191.225.207 'systemctl status kiberone-bot.service kiberone-botfinder.service --no-pager'",
+      "command": "ssh root@89.191.225.207 'systemctl status kiberone-bot.service --no-pager && (docker compose --env-file /opt/bots/lazart/night-hunger/.env -f /opt/bots/lazart/night-hunger/docker/docker-compose.prod.yml ps || docker-compose --env-file /opt/bots/lazart/night-hunger/.env -f /opt/bots/lazart/night-hunger/docker/docker-compose.prod.yml ps)'",
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "Status botfinder (manual)",
+      "type": "shell",
+      "command": "ssh root@89.191.225.207 'systemctl status kiberone-botfinder.service --no-pager'",
       "group": "test",
       "problemMatcher": []
     },

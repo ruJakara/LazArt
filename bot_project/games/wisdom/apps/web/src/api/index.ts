@@ -1,9 +1,0 @@
-export { authApi } from './auth';
-export { userApi } from './user';
-export { gameApi } from './game';
-export { upgradeApi } from './upgrade';
-export { inventoryApi } from './inventory';
-export { shopApi } from './shop';
-export { leaderboardApi } from './leaderboard';
-export { referralApi } from './referral';
-export { paymentApi } from './payment';
