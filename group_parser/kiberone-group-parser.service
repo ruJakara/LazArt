@@ -1,0 +1,16 @@
+[Unit]
+Description=LazArt Group Parser Telegram Bot
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/bots/lazart/group_parser
+EnvironmentFile=-/opt/bots/lazart/group_parser/.env
+Environment="PATH=/opt/bots/lazart/group_parser/venv/bin"
+ExecStart=/opt/bots/lazart/group_parser/venv/bin/python /opt/bots/lazart/group_parser/telegram_parser_bot.py
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

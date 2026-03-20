@@ -20,6 +20,13 @@
       "problemMatcher": []
     },
     {
+      "label": "Deploy group_parser",
+      "type": "shell",
+      "command": "ssh root@89.191.225.207 'cd /opt/bots/lazart/group_parser && bash deploy.sh'",
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
       "label": "Deploy botfinder",
       "type": "shell",
       "command": "ssh root@89.191.225.207 'cd /opt/bots/lazart/botfinder && bash deploy.sh'",
@@ -36,7 +43,14 @@
     {
       "label": "Status core projects",
       "type": "shell",
-      "command": "ssh root@89.191.225.207 'systemctl status kiberone-bot.service --no-pager && (docker compose --env-file /opt/bots/lazart/night-hunger/.env -f /opt/bots/lazart/night-hunger/docker/docker-compose.prod.yml ps || docker-compose --env-file /opt/bots/lazart/night-hunger/.env -f /opt/bots/lazart/night-hunger/docker/docker-compose.prod.yml ps)'",
+      "command": "ssh root@89.191.225.207 'systemctl status kiberone-bot.service --no-pager; systemctl status kiberone-group-parser.service --no-pager || true; (docker compose --env-file /opt/bots/lazart/night-hunger/.env -f /opt/bots/lazart/night-hunger/docker/docker-compose.prod.yml ps || docker-compose --env-file /opt/bots/lazart/night-hunger/.env -f /opt/bots/lazart/night-hunger/docker/docker-compose.prod.yml ps)'",
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "Status group_parser",
+      "type": "shell",
+      "command": "ssh root@89.191.225.207 'systemctl status kiberone-group-parser.service --no-pager'",
       "group": "test",
       "problemMatcher": []
     },

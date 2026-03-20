@@ -1,0 +1,7 @@
+__pycache__/
+*.py[cod]
+bot_output/
+live_groups.json
+subscriptions.db
+.env
+venv/

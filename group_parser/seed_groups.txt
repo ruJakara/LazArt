@@ -1,0 +1,18 @@
+# Используется в режиме DISCOVERY_MODE=seed или auto fallback.
+# Можно указывать:
+# - screen_name (пример: freelance_job)
+# - ссылку (пример: https://vk.com/podrabotka)
+# - club/public id (пример: club182051100)
+
+# Ниша: удаленная работа / подработка / фриланс
+freelance_job
+freelance_birzha
+podrabotka
+udalennaya_rabota
+udalenka_vakansii
+udalenka_rabota
+remote_job
+
+# Добавлены крупные job-комьюнити как fallback-пул
+headhunter
+superjob
