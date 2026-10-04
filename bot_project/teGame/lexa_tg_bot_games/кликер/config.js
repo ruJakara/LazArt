@@ -1,5 +1,0 @@
-window.GAME_CONFIG = {
-    SESSION_TIME: 60,
-    TARGET_SIZE: 140,
-    PADDING: 60
-};

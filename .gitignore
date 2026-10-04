@@ -1,0 +1,4 @@
+# Python bytecode is generated locally, not stored in Git.
+__pycache__/
+*.pyc
+*.pyo

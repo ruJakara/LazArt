@@ -1,2 +1,0 @@
-vk_api
-python-telegram-bot>=21,<22
