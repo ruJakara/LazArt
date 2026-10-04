@@ -1,0 +1,5 @@
+{
+  "cheap": {"name":"Cheap", "cost":1, "quality":0.55, "instruction_following":0.65},
+  "standard": {"name":"Standard", "cost":3, "quality":0.78, "instruction_following":0.82},
+  "smart": {"name":"Smart", "cost":7, "quality":0.94, "instruction_following":0.96}
+}

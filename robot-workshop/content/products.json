@@ -1,0 +1,8 @@
+{
+  "robot_vacuum_basic": {
+    "name":"Robot Vacuum Basic", "sale_price":500,
+    "parts":{"frame":1,"motor":1,"sensor":2,"battery":1,"controller":1},
+    "part_prices":{"frame":25,"motor":40,"sensor":15,"battery":35,"controller":35},
+    "part_names":{"frame":"Корпус","motor":"Мотор","sensor":"Датчик","battery":"Батарея","controller":"Контроллер"}
+  }
+}

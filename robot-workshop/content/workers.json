@@ -1,0 +1,8 @@
+{
+  "reception":{"name":"Приёмщик","zone":"Бюро заказов","color":"#72bcdd","model":"standard","context":2,"instructions":"Принимай заказы.","rules":[],"tools":["read_order","accept_order","reject_order"]},
+  "warehouse":{"name":"Кладовщик","zone":"Склад деталей","color":"#e7b563","model":"smart","context":20,"instructions":"Следи за складом.","rules":[],"tools":["issue_parts","order_parts","receive_delivery"]},
+  "engineer":{"name":"Инженер","zone":"Конструкторская","color":"#b6a1e2","model":"smart","context":5,"instructions":"Работай по схеме.","rules":["report_errors"],"tools":["read_blueprint","calculate_parts","report_problem"]},
+  "assembler":{"name":"Сборщик","zone":"Линия сборки","color":"#7fbe94","model":"cheap","context":0,"instructions":"Собирай быстро.","rules":["prioritize_speed"],"tools":["take_parts","assemble_vacuum","send_to_qc"]},
+  "qc":{"name":"Контролёр","zone":"Контроль качества","color":"#e49187","model":"smart","context":10,"instructions":"Контролируй качество.","rules":[],"tools":["approve_product","reject_product","request_rework"]},
+  "cleaner":{"name":"Техник","zone":"Сервис и уборка","color":"#90bab7","model":"smart","context":20,"instructions":"Поддерживай порядок.","rules":[],"tools":["check_workshop","clean_floor","remove_scrap","report_damage"]}
+}

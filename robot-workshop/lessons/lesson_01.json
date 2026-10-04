@@ -1,0 +1,7 @@
+{
+  "id":"lesson_01_factory", "title":"Маленькая мастерская", "days":7,
+  "starting_money":2500, "target_units":20, "product":"robot_vacuum_basic",
+  "workers":["reception","warehouse","engineer","assembler","qc","cleaner"],
+  "models":["cheap","standard","smart"],
+  "mechanics":{"models":true,"instructions":true,"tools":true,"context":true,"skills":false,"rag":false,"planner":false,"triggers":false,"multi_agent":false}
+}

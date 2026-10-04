@@ -1,0 +1,9 @@
+{
+  "weak":{"title":"Просто выполняй работу", "text":"Следи за своим участком.", "rules":[], "roles":["reception","warehouse","engineer","assembler","qc","cleaner"]},
+  "capacity":{"title":"Сначала оцени возможности", "text":"Проверь мощность цеха перед приёмом заказа.","rules":["check_capacity_before_accept"],"roles":["reception"]},
+  "stock":{"title":"Проверяй перед закупкой", "text":"Проверь остатки и закажи только недостающие детали.","rules":["check_before_order","do_not_overbuy"],"roles":["warehouse"]},
+  "careful":{"title":"Минимизируй ошибки", "text":"Работай по схеме, проверяй результат и сообщай о проблемах.","rules":["prioritize_quality","report_errors"],"roles":["engineer","assembler","qc","cleaner"]},
+  "test":{"title":"Проверь перед передачей", "text":"Проведи базовый тест перед отправкой на контроль.","rules":["test_before_send","report_errors"],"roles":["assembler"]},
+  "speed":{"title":"Работай быстро", "text":"Увеличивай выпуск, даже если потребуется переделка.","rules":["prioritize_speed"],"roles":["assembler"]},
+  "tidy":{"title":"Поддерживай порядок", "text":"Проверяй цех, убирай отходы и сообщай о повреждениях.","rules":["report_errors"],"roles":["cleaner"]}
+}

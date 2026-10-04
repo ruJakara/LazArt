@@ -1,0 +1,324 @@
+{
+  "read_order": {
+    "id": "read_order",
+    "name": "Прочитать заказ",
+    "description": "Прочитать заказ.",
+    "allowed_roles": [
+      "reception"
+    ],
+    "type": "READ",
+    "cost": 1,
+    "preconditions": [
+      "Получен заказ"
+    ],
+    "effect": "order_read"
+  },
+  "check_capacity": {
+    "id": "check_capacity",
+    "name": "Проверить мощность",
+    "description": "Проверить мощность.",
+    "allowed_roles": [
+      "reception"
+    ],
+    "type": "READ",
+    "cost": 1,
+    "preconditions": [
+      "Есть заказ"
+    ],
+    "effect": "capacity_checked"
+  },
+  "accept_order": {
+    "id": "accept_order",
+    "name": "Принять заказ",
+    "description": "Принять заказ.",
+    "allowed_roles": [
+      "reception"
+    ],
+    "type": "WRITE",
+    "cost": 1,
+    "preconditions": [
+      "Прочитан заказ"
+    ],
+    "effect": "order_accepted"
+  },
+  "reject_order": {
+    "id": "reject_order",
+    "name": "Отклонить лишнее",
+    "description": "Отклонить лишнее.",
+    "allowed_roles": [
+      "reception"
+    ],
+    "type": "WRITE",
+    "cost": 1,
+    "preconditions": [
+      "Оценён заказ"
+    ],
+    "effect": "order_rejected"
+  },
+  "check_stock": {
+    "id": "check_stock",
+    "name": "Проверить остатки",
+    "description": "Проверить остатки.",
+    "allowed_roles": [
+      "warehouse"
+    ],
+    "type": "READ",
+    "cost": 1,
+    "preconditions": [
+      "Есть склад"
+    ],
+    "effect": "stock_checked"
+  },
+  "issue_parts": {
+    "id": "issue_parts",
+    "name": "Выдать детали",
+    "description": "Выдать детали.",
+    "allowed_roles": [
+      "warehouse"
+    ],
+    "type": "WRITE",
+    "cost": 1,
+    "preconditions": [
+      "Детали в наличии"
+    ],
+    "effect": "parts_issued"
+  },
+  "order_parts": {
+    "id": "order_parts",
+    "name": "Заказать детали",
+    "description": "Заказать детали.",
+    "allowed_roles": [
+      "warehouse"
+    ],
+    "type": "DANGER",
+    "cost": 2,
+    "preconditions": [
+      "Достаточно денег"
+    ],
+    "effect": "parts_ordered"
+  },
+  "receive_delivery": {
+    "id": "receive_delivery",
+    "name": "Принять поставку",
+    "description": "Принять поставку.",
+    "allowed_roles": [
+      "warehouse"
+    ],
+    "type": "WRITE",
+    "cost": 1,
+    "preconditions": [
+      "Заказана поставка"
+    ],
+    "effect": "delivery_received"
+  },
+  "read_blueprint": {
+    "id": "read_blueprint",
+    "name": "Открыть схему",
+    "description": "Открыть схему.",
+    "allowed_roles": [
+      "engineer"
+    ],
+    "type": "READ",
+    "cost": 1,
+    "preconditions": [
+      "Есть изделие"
+    ],
+    "effect": "blueprint_read"
+  },
+  "calculate_parts": {
+    "id": "calculate_parts",
+    "name": "Рассчитать детали",
+    "description": "Рассчитать детали.",
+    "allowed_roles": [
+      "engineer"
+    ],
+    "type": "READ",
+    "cost": 1,
+    "preconditions": [
+      "Прочитана схема"
+    ],
+    "effect": "parts_calculated"
+  },
+  "report_problem": {
+    "id": "report_problem",
+    "name": "Сообщить о проблеме",
+    "description": "Сообщить о проблеме.",
+    "allowed_roles": [
+      "engineer"
+    ],
+    "type": "WRITE",
+    "cost": 1,
+    "preconditions": [
+      "Обнаружена ошибка"
+    ],
+    "effect": "problem_reported"
+  },
+  "take_parts": {
+    "id": "take_parts",
+    "name": "Взять детали",
+    "description": "Взять детали.",
+    "allowed_roles": [
+      "assembler"
+    ],
+    "type": "WRITE",
+    "cost": 1,
+    "preconditions": [
+      "Выдан комплект"
+    ],
+    "effect": "parts_taken"
+  },
+  "assemble_vacuum": {
+    "id": "assemble_vacuum",
+    "name": "Собрать пылесос",
+    "description": "Собрать пылесос.",
+    "allowed_roles": [
+      "assembler"
+    ],
+    "type": "WRITE",
+    "cost": 2,
+    "preconditions": [
+      "Есть комплект и схема"
+    ],
+    "effect": "vacuum_assembled"
+  },
+  "basic_test": {
+    "id": "basic_test",
+    "name": "Базовый тест",
+    "description": "Базовый тест.",
+    "allowed_roles": [
+      "assembler"
+    ],
+    "type": "READ",
+    "cost": 1,
+    "preconditions": [
+      "Изделие собрано"
+    ],
+    "effect": "basic_tested"
+  },
+  "send_to_qc": {
+    "id": "send_to_qc",
+    "name": "Передать на контроль",
+    "description": "Передать на контроль.",
+    "allowed_roles": [
+      "assembler"
+    ],
+    "type": "WRITE",
+    "cost": 1,
+    "preconditions": [
+      "Изделие собрано"
+    ],
+    "effect": "sent_to_qc"
+  },
+  "inspect_product": {
+    "id": "inspect_product",
+    "name": "Проверить изделие",
+    "description": "Проверить изделие.",
+    "allowed_roles": [
+      "qc"
+    ],
+    "type": "READ",
+    "cost": 2,
+    "preconditions": [
+      "Изделие на контроле"
+    ],
+    "effect": "product_inspected"
+  },
+  "approve_product": {
+    "id": "approve_product",
+    "name": "Одобрить изделие",
+    "description": "Одобрить изделие.",
+    "allowed_roles": [
+      "qc"
+    ],
+    "type": "WRITE",
+    "cost": 1,
+    "preconditions": [
+      "Изделие на контроле"
+    ],
+    "effect": "product_approved"
+  },
+  "reject_product": {
+    "id": "reject_product",
+    "name": "Забраковать",
+    "description": "Забраковать.",
+    "allowed_roles": [
+      "qc"
+    ],
+    "type": "WRITE",
+    "cost": 1,
+    "preconditions": [
+      "Обнаружен дефект"
+    ],
+    "effect": "product_rejected"
+  },
+  "request_rework": {
+    "id": "request_rework",
+    "name": "Запросить переделку",
+    "description": "Запросить переделку.",
+    "allowed_roles": [
+      "qc"
+    ],
+    "type": "WRITE",
+    "cost": 2,
+    "preconditions": [
+      "Обнаружен дефект"
+    ],
+    "effect": "rework_requested"
+  },
+  "check_workshop": {
+    "id": "check_workshop",
+    "name": "Осмотреть цех",
+    "description": "Осмотреть цех.",
+    "allowed_roles": [
+      "cleaner"
+    ],
+    "type": "READ",
+    "cost": 1,
+    "preconditions": [
+      "Цех доступен"
+    ],
+    "effect": "workshop_checked"
+  },
+  "clean_floor": {
+    "id": "clean_floor",
+    "name": "Очистить участок",
+    "description": "Очистить участок.",
+    "allowed_roles": [
+      "cleaner"
+    ],
+    "type": "WRITE",
+    "cost": 1,
+    "preconditions": [
+      "Цех доступен"
+    ],
+    "effect": "floor_cleaned"
+  },
+  "remove_scrap": {
+    "id": "remove_scrap",
+    "name": "Убрать отходы",
+    "description": "Убрать отходы.",
+    "allowed_roles": [
+      "cleaner"
+    ],
+    "type": "WRITE",
+    "cost": 1,
+    "preconditions": [
+      "Есть отходы"
+    ],
+    "effect": "scrap_removed"
+  },
+  "report_damage": {
+    "id": "report_damage",
+    "name": "Сообщить о поломке",
+    "description": "Сообщить о поломке.",
+    "allowed_roles": [
+      "cleaner"
+    ],
+    "type": "WRITE",
+    "cost": 1,
+    "preconditions": [
+      "Обнаружена поломка"
+    ],
+    "effect": "damage_reported"
+  }
+}

@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LazArt · Живая мастерская</title><link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main>
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark">L<i>●</i></span><div><strong>ROBOT WORKSHOP</strong><small>LAZART / МАЛЕНЬКАЯ МАСТЕРСКАЯ</small></div></div>
+      <div class="hud"><div><small>В кассе</small><strong id="balance">2 500 ₽</strong></div><div><small>План отгрузки</small><strong id="sold">0 <em>/ 20</em></strong></div><div><small>Смена</small><strong><span id="day">0</span> <em id="day-limit">/ 7</em></strong></div></div>
+      <details id="game-menu" class="game-menu"><summary aria-label="Меню игры">☰ <span>Меню</span></summary><div class="menu-content"><div class="mode-switch"><button id="auto-mode">AUTO</button><button id="python-mode">PYTHON</button></div><button id="save">Сохранить</button><button id="load">Загрузить</button><button id="compare">Сравнить прогоны</button><button id="same-seed">Повторить тот же seed</button><button id="new-seed">Новый seed</button><button id="restart-lesson">Сбросить урок</button><small>SEED <span id="seed">—</span> · v0.2</small></div></details>
+    </header>
+    <section id="python-panel" class="python-panel" hidden><div><strong>PYTHON MODE</strong><p>Редактируй и сохрани <code id="student-path"></code></p></div><div class="python-controls"><button id="open-folder" class="secondary">Открыть папку</button><button id="check-code" class="primary">Проверить код</button><button id="apply-code" class="secondary" disabled>Применить</button></div><pre id="code-result" hidden></pre></section>
+    <section class="workshop">
+      <div class="shift-bar"><div class="shift-caption"><i id="status-dot"></i><div><strong id="shift-status">Мастерская ждёт тебя</strong><small id="shift-message">Запусти день и посмотри, как работает команда.</small></div></div><div class="playback"><span id="shift-time">00:00</span><div class="speed-control" aria-label="Скорость смены"><button data-speed="1" class="active">×1</button><button data-speed="2">×2</button><button data-speed="4">×4</button></div><button id="pause-day" class="secondary" hidden>Ⅱ Пауза</button><button id="run-day" class="primary">▶ Запустить день</button></div></div>
+      <div class="map-shell"><div class="map-scroll"><canvas id="workshop" width="1200" height="690" aria-label="Карта мастерской: роботы перемещаются между рабочими участками"></canvas></div><span class="map-label">МАСТЕРСКАЯ № 01 <i>•</i> ROBOT VACUUM BASIC</span><div id="map-hint" class="map-hint">Нажми на робота или участок, чтобы посмотреть настройки.</div><div id="inspector" class="inspector" hidden><button id="close-inspector" class="icon-button" aria-label="Закрыть карточку">×</button><span id="inspector-zone" class="eyebrow"></span><h2 id="inspector-name"></h2><p id="inspector-task"></p><div id="inspector-meta"></div><button id="configure-worker" class="primary">Настроить работника</button></div></div>
+      <div class="map-footer"><div id="worker-nav" class="worker-nav"></div><div class="utility-buttons"><button id="open-report">Отчёты</button><button id="open-journal">Журнал</button><button id="open-stock">Склад</button><button id="fullscreen" aria-label="Полный экран">⛶</button></div></div>
+    </section>
+    <p id="result-banner" class="result-banner" hidden></p>
+    <footer><span>Настрой → наблюдай → исправь</span><span>Локальная игра · настоящие API не вызываются</span></footer>
+  </main>
+  <dialog id="config-dialog"><div class="dialog-heading"><div><span id="worker-zone" class="eyebrow"></span><h2 id="worker-title"></h2></div><button id="close-config" class="icon-button" aria-label="Закрыть">×</button></div><div id="config-body"></div><div class="dialog-footer"><span id="config-note"></span><button id="apply-config" class="primary">Сохранить настройки</button></div></dialog>
+  <dialog id="report-dialog"><div class="dialog-heading"><div><span class="eyebrow">СМЕНА ЗАКОНЧИЛАСЬ</span><h2 id="report-title">Итог дня</h2></div><button id="close-report" class="icon-button" aria-label="Закрыть">×</button></div><div id="report-body"></div><div id="final-panel" hidden></div><button id="back-to-map" class="primary wide">Вернуться в мастерскую →</button></dialog>
+  <dialog id="journal-dialog"><div class="dialog-heading"><h2>Журнал цеха</h2><button id="close-journal" class="icon-button" aria-label="Закрыть">×</button></div><select id="event-filter" aria-label="Фильтр журнала"><option value="all">Все события</option><option value="problems">Только проблемы</option></select><div id="events" class="event-list"></div></dialog>
+  <dialog id="stock-dialog"><div class="dialog-heading"><h2>Склад деталей</h2><button id="close-stock" class="icon-button" aria-label="Закрыть">×</button></div><div id="inventory" class="inventory"></div><p id="delivery-note" class="muted"></p></dialog>
+  <dialog id="compare-dialog"><div class="dialog-heading"><h2>Два прогона. Один seed.</h2><button id="close-compare" class="icon-button" aria-label="Закрыть">×</button></div><div id="compare-body"></div></dialog>
+  <dialog id="restart-dialog"><div class="dialog-heading"><h2>Начать заново?</h2></div><p>Текущая смена будет отменена. Завершённые дни станут базой для сравнения.</p><div class="dialog-footer"><button id="cancel-restart" class="secondary">Отмена</button><button id="confirm-restart" class="primary">Начать прогон</button></div></dialog>
+  <div id="toast" class="toast" role="status" hidden></div><div id="startup-error" class="startup-error" hidden></div>
+  <script src="map.js"></script><script src="app.js"></script>
+</body>
+</html>

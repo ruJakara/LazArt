@@ -1,0 +1,14 @@
+{
+  "context_sizes":[0,2,5,10,20], "context_cost":0.12, "tool_overhead":0.08,
+  "excess_context_penalty":0.04, "operating_cost":160, "capacity":5,
+  "orders":[5,6,4,7,5,6,5], "initial_stock_units":6, "overbuy_units":3,
+  "missed_order_penalty":18, "return_penalty":70, "scrap_cost":30,
+  "critical_return_rate":0.45, "critical_rate_after_days":3, "max_idle_days":3,
+  "base_defect_rate":0.05, "assembly_complexity":0.72, "engineering_complexity":0.6,
+  "inspection_complexity":0.65, "cleaning_complexity":0.12,
+  "quality_bonus":0.15, "test_bonus":0.10, "context_bonus_per_event":0.012,
+  "speed_capacity_bonus":1, "speed_defect_penalty":0.10,
+  "dirty_capacity_threshold":3, "dirty_defect_penalty":0.025,
+  "rework_success":0.85, "max_instruction_length":1000,
+  "lean_profit":4000, "cheap_ai_cost":1400
+}
